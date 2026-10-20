@@ -48,6 +48,8 @@ export default {
       body: ['14px', { lineHeight: '1.6' }],
       'body-lg': ['16px', { lineHeight: '1.6' }],
       button: ['16px', { lineHeight: '1.2', fontWeight: '600' }],
+      // Varian tombol lebih kecil untuk mobile (label panjang tak membungkus 2 baris)
+      'button-sm': ['14px', { lineHeight: '1.2', fontWeight: '600' }],
       subtitle: ['18px', { lineHeight: '1.4', fontWeight: '500' }],
       title: ['24px', { lineHeight: '1.3', fontWeight: '700' }],
       // Konten Arab butuh line-height longgar agar harakat tidak bertumpuk

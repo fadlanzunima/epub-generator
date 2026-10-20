@@ -119,7 +119,7 @@ export function CoverPanel({
                       <CoverCanvas title={title} theme={s.id} width={34} />
                     </span>
                     <span className="flex min-w-0 flex-col">
-                      <span className="font-ui text-button">{s.label}</span>
+                      <span className="font-ui text-button-sm sm:text-button">{s.label}</span>
                       <span className={`font-ui text-body ${active ? 'text-white' : 'text-ink-muted'}`}>
                         {s.desc}
                       </span>

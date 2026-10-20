@@ -71,7 +71,7 @@
   /* Tombol E-Ink standar: border tegas 2px, solid fill, tap target besar, tanpa animasi */
   .btn-eink {
     @apply inline-flex items-center justify-center min-h-tap px-5 border-eink border-black
-           bg-white text-black font-ui text-button select-none;
+           bg-white text-black font-ui text-button-sm sm:text-button select-none;
   }
 
   .btn-eink--inverted {

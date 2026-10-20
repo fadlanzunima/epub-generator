@@ -100,7 +100,7 @@ export function OptionCard({
                   disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-paper-soft disabled:text-ink-faint
                   focus-visible:outline-none focus-visible:border-dashed`}
     >
-      <span className="font-ui text-button">{title}</span>
+      <span className="font-ui text-button-sm sm:text-button">{title}</span>
       <span className={`font-ui text-body ${active ? 'text-white' : 'text-ink-muted'}`}>{desc}</span>
     </button>
   )
@@ -124,7 +124,7 @@ export function SegmentedOption({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`min-h-tap min-w-0 flex-1 border-eink border-black px-3 font-ui text-button
+      className={`min-h-tap min-w-0 flex-1 border-eink border-black px-2 sm:px-3 font-ui text-button-sm sm:text-button
                   ${active ? 'bg-black text-white' : 'bg-white text-black'}
                   disabled:text-ink-faint disabled:border-gray-400 disabled:bg-paper-soft disabled:cursor-not-allowed
                   focus-visible:outline-none focus-visible:border-dashed`}
