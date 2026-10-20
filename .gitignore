@@ -5,6 +5,12 @@ dist-ssr
 .vite
 *.tsbuildinfo
 
+# Environment variables (RAHASIA — token bot Telegram dll). Jangan commit.
+.env
+.env.*
+!.env.example
+.vercel
+
 # Editor
 .vscode/*
 !.vscode/extensions.json

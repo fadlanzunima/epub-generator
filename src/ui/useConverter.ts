@@ -8,6 +8,7 @@ import type { ThemeId } from '@cover'
 import type { DocumentIR, PreflightResult, TextDirection } from '@core/types'
 import { pushToast } from './toast'
 import { ensureNotifyPermission, notifyBuildDone } from './notify'
+import { reportEvent } from './telemetry'
 
 /** Status mesin konversi (state machine linear). */
 export type ConvertStatus = 'idle' | 'parsing' | 'ready' | 'building' | 'done' | 'error'
@@ -212,6 +213,14 @@ export function useConverter() {
     setError(null)
     setBuildNotices([])
     resetOutput()
+    // Telemetri: percobaan build.
+    reportEvent({
+      event: 'attempt',
+      title: cleanTitle,
+      source: ir.meta.source,
+      script: ir.meta.script,
+      chapters: ir.chapters.length,
+    })
     // Build berjalan asinkron (non-blocking) — pengguna boleh berpindah tab.
     // Minta izin notifikasi (gesture klik) agar bisa diberi tahu saat selesai.
     void ensureNotifyPermission()
@@ -296,11 +305,28 @@ export function useConverter() {
       // Toast in-app + notifikasi sistem (muncul walau tab di-background).
       pushToast(`EPUB selesai dibuat · ${fileName}. Siap diunduh.`, 'success', 7000)
       notifyBuildDone(cleanTitle, blob.size)
+      // Telemetri: sukses.
+      reportEvent({
+        event: 'success',
+        title: cleanTitle,
+        bytes: blob.size,
+        source: ir.meta.source,
+        script: ir.meta.script,
+        chapters: ir.chapters.length,
+      })
     } catch (e) {
       const msg = (e as Error).message
       setError(msg)
       setStatus('error')
       pushToast(`Gagal membangun EPUB: ${msg}`, 'error', 8000)
+      // Telemetri: gagal.
+      reportEvent({
+        event: 'fail',
+        title: cleanTitle,
+        source: ir.meta.source,
+        script: ir.meta.script,
+        error: msg,
+      })
     }
   }, [ir, title, author, language, direction, publisher, description, subjects, coverMode, coverTheme, customCover, embedFonts, customFonts, cjkFontId, resetOutput])
 

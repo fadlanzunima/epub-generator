@@ -94,10 +94,29 @@ Gambar / Tanpa Sampul) dengan **pratinjau WYSIWYG** dan pemilih **Gaya** ber-thu
 
 ## Prinsip Arsitektur
 
-- **100% client-side** — tanpa backend; seluruh proses di RAM browser.
+- **Client-side** — konversi dokumen 100% di RAM browser; isi dokumen tidak pernah
+  diunggah. (Pengecualian opsional: **telemetri build** — lihat di bawah.)
 - **Ringan & instan** — target < 50MB RAM, < 1–2 detik per konversi.
 - **Zero-Bloat CSS** — tanpa shadow/gradient/animasi (ramah E-Ink, anti-ghosting).
 - **Non-AI** — parsing & deteksi bahasa berbasis library ringan + Unicode range.
+
+### Kompatibilitas perangkat
+
+- **Peramban tak didukung** (mis. browser bawaan **Kindle lama**/Experimental Browser):
+  aplikasi mendeteksi ketiadaan fitur inti (ES Modules, WebAssembly, Worker, Canvas)
+  dan menampilkan **pesan panduan** (buat di HP/PC lalu kirim `.epub` via Send-to-Kindle),
+  bukan layar kosong. EPUB hasilnya tetap kompatibel dengan Kindle lama.
+- **Mode Hemat Memori** (tombol *Hemat RAM* di header, otomatis aktif bila
+  `deviceMemory ≤ 2GB`): menyembunyikan fitur boros memori — **OCR** & **embed font CJK** —
+  agar lancar di E-Ink/ponsel RAM kecil.
+
+### Telemetri (opsional, mati secara bawaan)
+
+Aplikasi dapat mengirim **ringkasan event build** (mulai/sukses/gagal) ke Telegram pemilik
+lewat `api/report.ts` (Vercel Edge Function). Yang dikirim hanya **metadata**: judul,
+ukuran berkas, jenis sumber, skrip, jumlah bab, user-agent, waktu — **bukan isi dokumen**.
+Telemetri **hanya aktif** bila env `TELEGRAM_BOT_TOKEN` & `TELEGRAM_CHAT_ID` di-set di Vercel
+(lihat [`.env.example`](.env.example)); tanpa itu endpoint no-op dan tak ada data terkirim.
 
 ## Tech Stack
 
