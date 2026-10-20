@@ -1,0 +1,45 @@
+{
+  "name": "epub-builder-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PWA Non-AI, 100% client-side, untuk konversi dokumen menjadi EPUB 3.0 ramah E-Ink (Kindle/Kobo/Onyx/Meebook) dengan dukungan Arab/Qur'an RTL.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit",
+    "smoke": "tsx --tsconfig tsconfig.app.json scripts/smoke.ts",
+    "validate": "tsx --tsconfig tsconfig.app.json scripts/validate.ts",
+    "epubcheck": "tsx --tsconfig tsconfig.app.json scripts/epubcheck.ts"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "franc-min": "^6.2.0",
+    "harfbuzzjs": "^0.4.15",
+    "jszip": "^3.10.2",
+    "mammoth": "^1.13.0",
+    "marked": "^18.1.1",
+    "qrcode": "^1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tesseract.js": "^5.1.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^22.9.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^0.21.1"
+  }
+}

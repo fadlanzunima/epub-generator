@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Java (untuk epubcheck)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Smoke test (pipeline)
+        run: npm run smoke
+
+      - name: Validasi konformansi EPUB (JS)
+        run: npm run validate
+
+      - name: Build produksi (PWA)
+        run: npm run build
+
+      # Cache jar epubcheck agar tak diunduh ulang tiap run.
+      - name: Cache epubcheck
+        uses: actions/cache@v4
+        with:
+          path: .epubcheck-cache
+          key: epubcheck-5.1.0
+
+      - name: Validasi OTORITATIF (epubcheck resmi)
+        run: npm run epubcheck

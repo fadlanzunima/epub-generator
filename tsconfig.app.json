@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@core": ["src/core/index.ts"],
+      "@core/*": ["src/core/*"],
+      "@parsers": ["src/parsers/index.ts"],
+      "@parsers/*": ["src/parsers/*"],
+      "@epub": ["src/epub/index.ts"],
+      "@epub/*": ["src/epub/*"],
+      "@fonts": ["src/fonts/index.ts"],
+      "@fonts/*": ["src/fonts/*"],
+      "@cover": ["src/cover/index.ts"],
+      "@cover/*": ["src/cover/*"],
+      "@ui": ["src/ui/index.ts"],
+      "@ui/*": ["src/ui/*"],
+      "@pwa": ["src/pwa/index.ts"],
+      "@pwa/*": ["src/pwa/*"]
+    }
+  },
+  "include": ["src"]
+}

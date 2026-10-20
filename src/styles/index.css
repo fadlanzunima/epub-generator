@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens E-Ink (CSS variables) — dipakai juga oleh Immersion Mode
+ * untuk menukar nuansa UI secara instan (Warm Paper <-> Pure Grayscale).
+ */
+:root {
+  --paper: #f8f6f0;
+  --paper-soft: #efebe1;
+  --ink: #000000;
+  --ink-muted: #4d4d4d;
+  color-scheme: light;
+}
+
+/* Pure Grayscale High-Contrast mode (hitam-putih tajam) */
+:root[data-tone='grayscale'] {
+  --paper: #ffffff;
+  --paper-soft: #f2f2f2;
+  --ink: #000000;
+  --ink-muted: #262626;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: Inter, Roboto, 'Noto Sans', system-ui, sans-serif;
+    /* Kontras tajam, tanpa anti-alias berlebih yang memburamkan e-ink */
+    -webkit-font-smoothing: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Konten Arab/Qur'an: RTL + line-height longgar agar harakat tidak bertumpuk */
+  [dir='rtl'] {
+    font-family: 'LPMQ Isep Misbah', 'KFGQPC Uthmanic Hafs', 'Amiri Quran', 'Scheherazade New', serif;
+    line-height: 2;
+  }
+}
+
+@layer components {
+  /* Tombol E-Ink standar: border tegas 2px, solid fill, tap target besar, tanpa animasi */
+  .btn-eink {
+    @apply inline-flex items-center justify-center min-h-tap px-5 border-eink border-black
+           bg-white text-black font-ui text-button select-none;
+  }
+
+  .btn-eink--inverted {
+    @apply bg-black text-white border-black;
+  }
+
+  /* Tactile feedback tanpa transisi halus: border putus-putus saat focus */
+  .btn-eink:focus-visible {
+    @apply outline-none border-dashed;
+  }
+
+  .btn-eink:disabled {
+    @apply text-ink-faint border-gray-400 bg-paper-soft cursor-not-allowed;
+  }
+}
