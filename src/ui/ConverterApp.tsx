@@ -15,6 +15,8 @@ import { useConverter } from './useConverter'
 import { useImmersion } from './useImmersion'
 import { useOnboarding } from './useOnboarding'
 import { useOnline } from './useOnline'
+import { Toasts } from './Toasts'
+import { pushToast } from './toast'
 import { CJK_FONT_CHOICES } from '@fonts'
 import type { ScriptHint, TextDirection } from '@core/types'
 
@@ -44,6 +46,7 @@ export function ConverterApp() {
   const twoPane = loaded && !isImageBook && Boolean(c.ir?.chapters[0])
 
   return (
+    <>
     <main
       className={`mx-auto flex min-h-full w-full flex-col gap-6 px-5 py-8 ${
         twoPane ? 'max-w-2xl lg:max-w-5xl' : 'max-w-2xl'
@@ -102,7 +105,20 @@ export function ConverterApp() {
             onImage={c.loadImage}
             onImages={c.loadImages}
           />
-          <StarterLibrary busy={busy} online={online} onPick={(p) => c.loadPreset(p.load, p.title)} />
+          <StarterLibrary
+            busy={busy}
+            online={online}
+            onPick={(p) => {
+              if (p.online && !online) {
+                pushToast(`"${p.title}" perlu koneksi internet (diambil dari repo publik).`, 'warning')
+                return
+              }
+              if (p.online) {
+                pushToast(`Mengambil "${p.title}" dari repo publik online…`, 'info')
+              }
+              c.loadPreset(p.load, p.title)
+            }}
+          />
         </>
       )}
 
@@ -277,5 +293,7 @@ export function ConverterApp() {
         Non-AI · 100% Client-Side · Berkas · URL · OCR · Arab/Qur'an · PWA Offline
       </footer>
     </main>
+    <Toasts />
+    </>
   )
 }

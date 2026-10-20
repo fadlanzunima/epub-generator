@@ -57,6 +57,17 @@ berkas `.epub` siap unduh:
 |:---:|:---:|
 | ![Juz Amma RTL pada simulator Bigme](docs/screenshots/mobile-android-arab.png) | ![EPUB 96.7 KB siap unduh](docs/screenshots/mobile-result.png) |
 
+### Notifikasi & build latar belakang
+
+Pembuatan EPUB berjalan **asinkron (non-blocking)** — Anda boleh berpindah tab/aplikasi saat
+proses jalan. Saat selesai muncul **toast in-app** (dan **notifikasi sistem** bila diizinkan,
+berguna ketika tab di-background). App juga memberi tahu lewat toast saat sebuah aksi **butuh
+koneksi** (Pustaka online, font CJK) atau saat **font CJK gagal diunduh** (jatuh ke font eReader).
+
+<p align="center">
+  <img src="docs/screenshots/mobile-toast.png" alt="Toast: membangun & EPUB selesai dibuat" width="300">
+</p>
+
 ## Prinsip Arsitektur
 
 - **100% client-side** — tanpa backend; seluruh proses di RAM browser.

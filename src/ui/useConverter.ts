@@ -6,6 +6,8 @@ import { generateCoverBlob } from '@cover'
 import { registerCustomFont, type CustomFont } from '@fonts'
 import type { ThemeId } from '@cover'
 import type { DocumentIR, PreflightResult } from '@core/types'
+import { pushToast } from './toast'
+import { ensureNotifyPermission, notifyBuildDone } from './notify'
 
 /** Status mesin konversi (state machine linear). */
 export type ConvertStatus = 'idle' | 'parsing' | 'ready' | 'building' | 'done' | 'error'
@@ -105,6 +107,7 @@ export function useConverter() {
         }
         setError(msg)
         setStatus('error')
+        pushToast(msg, 'error', 8000)
       }
     },
     [resetOutput],
@@ -184,6 +187,17 @@ export function useConverter() {
     setError(null)
     setBuildNotices([])
     resetOutput()
+    // Build berjalan asinkron (non-blocking) — pengguna boleh berpindah tab.
+    // Minta izin notifikasi (gesture klik) agar bisa diberi tahu saat selesai.
+    void ensureNotifyPermission()
+    const needCjkDownload = ir.meta.script === 'cjk' && !!cjkFontId
+    pushToast(
+      needCjkDownload
+        ? 'Membangun EPUB & mengunduh font CJK… boleh berpindah tab, Anda akan diberi tahu saat selesai.'
+        : 'Membangun EPUB… boleh berpindah tab, Anda akan diberi tahu saat selesai.',
+      'info',
+      6000,
+    )
     try {
       const finalIr: DocumentIR = {
         ...ir,
@@ -224,6 +238,7 @@ export function useConverter() {
         )
       }
       setBuildNotices(notices)
+      notices.forEach((n) => pushToast(n, 'warning', 8000))
 
       const blob = (await buildEpub(finalIr, {
         identifier: `urn:uuid:${crypto.randomUUID()}`,
@@ -235,11 +250,17 @@ export function useConverter() {
       })) as Blob
 
       const url = URL.createObjectURL(blob)
-      setResult({ url, fileName: toEpubFileName(cleanTitle), bytes: blob.size, blob })
+      const fileName = toEpubFileName(cleanTitle)
+      setResult({ url, fileName, bytes: blob.size, blob })
       setStatus('done')
+      // Toast in-app + notifikasi sistem (muncul walau tab di-background).
+      pushToast(`EPUB selesai dibuat · ${fileName}. Siap diunduh.`, 'success', 7000)
+      notifyBuildDone(cleanTitle, blob.size)
     } catch (e) {
-      setError((e as Error).message)
+      const msg = (e as Error).message
+      setError(msg)
       setStatus('error')
+      pushToast(`Gagal membangun EPUB: ${msg}`, 'error', 8000)
     }
   }, [ir, title, author, coverMode, coverTheme, customCover, embedFonts, customFonts, cjkFontId, resetOutput])
 
