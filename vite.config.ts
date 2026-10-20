@@ -6,6 +6,9 @@ import { fileURLToPath, URL } from 'node:url'
 // 100% client-side PWA. Service Worker memungkinkan Mode Offline Standalone
 // (seluruh konversi dokumen lokal berjalan tanpa jaringan).
 export default defineConfig({
+  // Worker subsetting font (subsetWorker) memakai dynamic import (wasm) → code-split,
+  // sehingga format worker harus ES module (bukan default 'iife').
+  worker: { format: 'es' },
   plugins: [
     react(),
     VitePWA({

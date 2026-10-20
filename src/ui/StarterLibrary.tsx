@@ -10,6 +10,7 @@ import { Section } from './primitives'
 const CATEGORY_LABEL: Record<PresetItem['category'], string> = {
   quran: 'Al-Qur’an',
   document: 'Dokumen Publik',
+  classic: 'Buku Klasik',
 }
 
 export function StarterLibrary({

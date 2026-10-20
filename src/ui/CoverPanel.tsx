@@ -73,12 +73,18 @@ export function CoverPanel({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 sm:flex-row" role="group" aria-label="Sumber sampul">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap" role="group" aria-label="Sumber sampul">
         <OptionCard
           active={mode === 'auto'}
           onClick={() => onMode('auto')}
           title="Buat Otomatis"
           desc="Dari judul & gaya"
+        />
+        <OptionCard
+          active={mode === 'extract'}
+          onClick={() => onMode('extract')}
+          title="Ambil dari Dokumen"
+          desc="Gambar pertama dokumen"
         />
         <OptionCard
           active={mode === 'custom'}
@@ -93,6 +99,13 @@ export function CoverPanel({
           desc="EPUB tanpa gambar"
         />
       </div>
+
+      {mode === 'extract' && (
+        <p className="font-ui text-body text-ink-muted">
+          Sampul diambil dari <strong>gambar pertama</strong> di dokumen saat Build. Bila dokumen
+          tak memuat gambar (atau gambarnya tautan online yang terblokir), EPUB dibuat tanpa sampul.
+        </p>
+      )}
 
       {mode === 'auto' && (
         <div className="flex flex-col gap-4">

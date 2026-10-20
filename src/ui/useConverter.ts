@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { parseFile, parseUrl, parseHtmlArticle, parseImageOcr, parseImagesToBook } from '@parsers'
 import { preflight } from '@core'
 import { buildEpub, provideFonts } from '@epub'
-import { generateCoverBlob } from '@cover'
+import { generateCoverBlob, resolveFirstImageCover } from '@cover'
 import { registerCustomFont, type CustomFont } from '@fonts'
 import type { ThemeId } from '@cover'
 import type { DocumentIR, PreflightResult, TextDirection } from '@core/types'
@@ -14,7 +14,7 @@ import { reportEvent } from './telemetry'
 export type ConvertStatus = 'idle' | 'parsing' | 'ready' | 'building' | 'done' | 'error'
 
 /** Sumber sampul yang dipilih pengguna. */
-export type CoverMode = 'none' | 'auto' | 'custom'
+export type CoverMode = 'none' | 'auto' | 'custom' | 'extract'
 
 export interface CustomCover {
   data: ArrayBuffer
@@ -264,6 +264,15 @@ export function useConverter() {
         cover = { data: await blob.arrayBuffer(), mime: blob.type || 'image/jpeg' }
       } else if (coverMode === 'custom' && customCover) {
         cover = { data: customCover.data, mime: customCover.mime }
+      } else if (coverMode === 'extract') {
+        cover = await resolveFirstImageCover(ir)
+        if (!cover) {
+          pushToast(
+            'Tidak menemukan gambar yang bisa dipakai di dokumen — EPUB dibuat tanpa sampul.',
+            'warning',
+            7000,
+          )
+        }
       }
 
       // Font embed (di-skip graceful bila biner belum dibundel). Font kustom

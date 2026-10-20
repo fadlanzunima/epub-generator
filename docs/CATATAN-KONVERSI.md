@@ -46,6 +46,11 @@ rekomendasi per-sumber. Tanda: 🔔 = sudah diberitahu di app (toast/banner), �
 ### Pustaka (quran.com) 🔔
 - Butuh internet + API hidup; terjemahan terkunci **Kemenag (id-33)**.
 
+### Pustaka klasik (Wikisource) 🔔
+- Butuh internet; teks ditarik via **MediaWiki action API** (CORS `origin=*`) lalu dibersihkan
+  Readability. Hanya judul yang **teksnya utuh di satu halaman** yang cocok (sebagian karya
+  Wikisource dipecah ke sub-halaman). **Gutenberg** tidak dipakai langsung — servernya tanpa CORS.
+
 ## C. Font
 - Hanya **font utama per-skrip** yang di-embed (Resource Lean); cadangan hanya di CSS stack. 🔇
 - Checkbox **"Sematkan font" OFF** pada dokumen non-Latin → Arab bisa rusak di device tanpa font. 🔇
@@ -54,8 +59,9 @@ rekomendasi per-sumber. Tanda: 🔔 = sudah diberitahu di app (toast/banner), �
 
 ## D. Lingkungan / runtime
 - Semua di **RAM browser** — dokumen sangat besar bisa lambat/kehabisan memori (target <50MB, <2 dtk).
-- Build asinkron (non-blocking) + notifikasi saat selesai. 🔔 **Catatan**: subset font **CJK**
-  (10–18 MB) masih sinkron → bisa freeze UI sesaat untuk dokumen CJK besar (belum dipindah Web Worker).
+- Build asinkron (non-blocking) + notifikasi saat selesai. Subsetting font (termasuk **CJK**
+  10–18 MB) kini berjalan di **Web Worker** → UI tak freeze; fail-safe (font utuh bila gagal) +
+  fallback main-thread bila Worker tak tersedia.
 - Build butuh fetch `/fonts/` + `hb-subset.wasm` (lazy); offline pertama kali sebelum ter-cache → embed bisa gagal.
 - **Mode Hemat Memori** 🔔 (tombol *Hemat RAM*, auto bila `deviceMemory ≤ 2GB`): menyembunyikan
   **OCR** & **embed font CJK** (fitur paling boros RAM) agar lancar di E-Ink/HP kecil. Konversi

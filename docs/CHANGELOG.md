@@ -31,6 +31,19 @@ Acuan produk: [BRIEF.md](BRIEF.md). Catatan yang memengaruhi hasil: [CATATAN-KON
   (judul, ukuran, sumber, skrip, jumlah bab, user-agent, waktu) — **isi dokumen tidak dikirim**.
   Pembantu setup: `npm run telegram:setup`.
 
+### Penuntasan fitur brief
+- **Auto-Extract Cover** (jalur sampul ke-3 sesuai brief): mode **"Ambil dari Dokumen"** →
+  pakai **gambar pertama** dokumen sebagai sampul. Resolver menangani data-URI (docx),
+  path aset (Image-Book), & URL remote (artikel); bila tak ada gambar → EPUB tanpa sampul
+  + toast. `src/cover/extract.ts` (`resolveFirstImageCover`).
+- **Pustaka klasik (Public Repo Integration)**: preset **Student Hidjo** (Mas Marco
+  Kartodikromo, 1919 — public domain) via **Wikisource** (MediaWiki action API, CORS `origin=*`),
+  dibersihkan dengan pipeline Readability yang ada. Kategori baru "Buku Klasik".
+  `src/presets/wikisource.ts`. (Gutenberg di-skip: server tanpa CORS.)
+- **Subsetting font di Web Worker**: subset HarfBuzz dipindah ke `subsetWorker` (via
+  `subsetClient`, `vite worker.format:'es'`) → **UI tak freeze** untuk font besar (CJK 10–18 MB);
+  fail-safe (echo font utuh) + fallback main-thread bila Worker tak tersedia.
+
 ### Deviasi dari brief (baru)
 - **Telemetri** bertentangan dengan "privasi data terjaga" bila diaktifkan — bersifat
   **opt-in via env** & diungkapkan di README/CATATAN; isi dokumen tetap tak dikirim.

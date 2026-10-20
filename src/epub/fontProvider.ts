@@ -1,5 +1,6 @@
 import type { DocumentIR, ScriptHint } from '@core/types'
-import { collectUsedChars, subsetFont } from '@fonts/subset'
+import { collectUsedChars } from '@fonts/subset'
+import { subsetFontOffMain } from '@fonts/subsetClient'
 import { FONT_REGISTRY, fontsForScript, primaryFont } from '@fonts/fonts'
 import type { FontAsset } from '@fonts/fonts'
 import type { CustomFont } from '@fonts/customFont'
@@ -66,7 +67,7 @@ export async function provideFonts(ir: DocumentIR, opts: ProvideFontsOptions = {
         } else {
           throw new Error(`HTTP ${local?.status ?? 'gagal'}`)
         }
-        if (doSubset) data = await subsetFont({ fontData: data, chars })
+        if (doSubset) data = await subsetFontOffMain({ fontData: data, chars })
         binaries.push({ file: f.file, format: asset.format, data })
       } catch (e) {
         console.warn(`[fontProvider] lewati ${f.file}: ${(e as Error).message}`)
@@ -79,7 +80,7 @@ export async function provideFonts(ir: DocumentIR, opts: ProvideFontsOptions = {
   for (const cf of opts.custom ?? []) {
     const bin = cf.asset.files[0]
     let data = cf.data
-    if (doSubset) data = await subsetFont({ fontData: data, chars })
+    if (doSubset) data = await subsetFontOffMain({ fontData: data, chars })
     result.push({
       asset: cf.asset,
       binaries: [{ file: bin.file, format: cf.asset.format, data }],

@@ -7,8 +7,9 @@
 import type { DocumentIR } from '@core/types'
 import { fetchJuzAmmaIR } from './quran'
 import { buildUUD1945IR } from './bundled'
+import { fetchWikisourceIR } from './wikisource'
 
-export type PresetCategory = 'quran' | 'document'
+export type PresetCategory = 'quran' | 'document' | 'classic'
 
 export interface PresetItem {
   id: string
@@ -44,5 +45,14 @@ export const PRESETS: PresetItem[] = [
     category: 'document',
     online: false,
     load: async () => buildUUD1945IR(),
+  },
+  {
+    id: 'student-hidjo',
+    title: 'Student Hidjo (Marco Kartodikromo)',
+    description: 'Novel klasik Indonesia (1919), public domain — diambil dari Wikisource Indonesia.',
+    category: 'classic',
+    online: true,
+    load: () =>
+      fetchWikisourceIR({ page: 'Student Hidjo', lang: 'id', author: 'Mas Marco Kartodikromo' }),
   },
 ]

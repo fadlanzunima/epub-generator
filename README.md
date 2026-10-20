@@ -29,7 +29,7 @@ Antarmuka **E-Ink serif** dengan **Dual-Pane** di tablet/PC — editor di kiri, 
 </p>
 
 Di ponsel/eReader tampil satu kolom. Masukan lewat **Berkas / URL / OCR / Gambar (Buku)**, atau
-**Pustaka Siap-Pakai** (Juz Amma via quran.com API, UUD 1945 offline):
+**Pustaka Siap-Pakai** (Juz Amma via quran.com API, UUD 1945 offline, buku klasik via Wikisource mis. *Student Hidjo*):
 
 | Onboarding | Masukan + Pustaka Siap-Pakai | Live Simulator (page-flip) |
 |:---:|:---:|:---:|
@@ -160,4 +160,4 @@ npm run epubcheck  # validasi OTORITATIF via epubcheck resmi IDPF/W3C (butuh Jav
 | `cover/` | Canvas cover generator adaptif | 3 |
 | `ui/` | komponen E-Ink, simulator (gulir/halaman), immersion, onboarding, dual-pane | 4 & 5 |
 | `pwa/` | service worker, QR transfer, Send-to-Kindle | 6 |
-| `presets/` | Pustaka siap-pakai: quran.com API (Juz Amma), UUD 1945 offline | — |
+| `presets/` | Pustaka siap-pakai: quran.com API (Juz Amma), UUD 1945 offline, Wikisource (buku klasik) | — |
