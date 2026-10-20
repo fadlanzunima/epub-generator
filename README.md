@@ -1,9 +1,12 @@
 # EPUB Builder — Data to eReader (PWA)
 
 Aplikasi **PWA 100% client-side, Non-AI, gratis** untuk mengubah dokumen
-(`.docx`, `.md`, `.txt`, `.csv`, `.xlsx`, URL artikel, gambar/OCR) menjadi
+(`.docx`, `.md`, `.txt`, `.csv`, `.xlsx`, `.pdf`, URL artikel, gambar/OCR) menjadi
 **EPUB 3.0 valid** yang dioptimalkan untuk layar **E-Ink** (Kindle, Kobo,
-Onyx Boox, Meebook), dengan dukungan penuh skrip **Arab/Qur'an (RTL + font embed)**.
+Onyx Boox, Meebook, **Bigme** & eReader Android lain), dengan dukungan penuh
+skrip **Arab/Qur'an (RTL + font embed)**.
+
+📄 [Product Brief](docs/BRIEF.md) · 📝 [Changelog](docs/CHANGELOG.md) · ⚠️ [Catatan Konversi (kondisi yang memengaruhi hasil, termasuk PDF)](docs/CATATAN-KONVERSI.md)
 
 > Status: **Lengkap & tervalidasi.** Mesin konversi (parsers · fonts · epub · cover),
 > antarmuka E-Ink (Unggah → Metadata → Sampul → Build → Transfer) dengan **Dual-Pane**
@@ -68,6 +71,14 @@ koneksi** (Pustaka online, font CJK) atau saat **font CJK gagal diunduh** (jatuh
   <img src="docs/screenshots/mobile-toast.png" alt="Toast: membangun & EPUB selesai dibuat" width="300">
 </p>
 
+**Konversi PDF.** PDF **berteks** diekstrak langsung (pdf.js, lazy) dengan deteksi bab dari
+ukuran font; PDF **hasil pindai** diarahkan ke OCR/Image-Book. Contoh: sebuah PDF laporan →
+4 bab otomatis (lihat [Catatan Konversi](docs/CATATAN-KONVERSI.md) untuk kondisi lengkap):
+
+<p align="center">
+  <img src="docs/screenshots/mobile-pdf.png" alt="Konversi PDF → bab otomatis" width="300">
+</p>
+
 ## Prinsip Arsitektur
 
 - **100% client-side** — tanpa backend; seluruh proses di RAM browser.
@@ -78,7 +89,8 @@ koneksi** (Pustaka online, font CJK) atau saat **font CJK gagal diunduh** (jatuh
 ## Tech Stack
 
 Vite · React · TypeScript · Tailwind CSS (zero-bloat) · `vite-plugin-pwa` ·
-JSZip · Mammoth · SheetJS · Marked · Readability · franc-min · Tesseract.js (lazy).
+JSZip · Mammoth · SheetJS · **pdf.js** · Marked · Readability · franc-min ·
+Tesseract.js · HarfBuzz subset (semua lazy-load).
 
 ## Menjalankan
 
@@ -110,7 +122,7 @@ npm run epubcheck  # validasi OTORITATIF via epubcheck resmi IDPF/W3C (butuh Jav
 | Folder | Tanggung jawab | Fase |
 |---|---|---|
 | `core/` | IR dokumen, pipeline compiler, pre-flight check | 1 |
-| `parsers/` | docx, md, csv/xlsx, url, ocr | 1 & 5 |
+| `parsers/` | docx, md, txt, csv/xlsx, **pdf**, url, ocr, image-book | 1 & 5 |
 | `fonts/` | font builder RTL, subsetting, language detector | 2 |
 | `epub/` | perakit JSZip, OPF/NAV/NCX, splitter, image pipeline | 3 |
 | `cover/` | Canvas cover generator adaptif | 3 |

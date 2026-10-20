@@ -4,7 +4,7 @@
  */
 import { useCallback, useRef, useState } from 'react'
 
-const ACCEPT = '.docx,.md,.markdown,.txt,.csv,.xlsx,.xls'
+const ACCEPT = '.docx,.md,.markdown,.txt,.csv,.xlsx,.xls,.pdf'
 
 export function Dropzone({
   onFile,
@@ -44,7 +44,7 @@ export function Dropzone({
         {busy ? 'Memproses dokumen…' : 'Seret berkas ke sini'}
       </p>
       <p className="font-ui text-body text-ink-muted">
-        .docx · .md · .txt · .csv · .xlsx — diproses sepenuhnya di perangkat Anda
+        .docx · .md · .txt · .csv · .xlsx · .pdf — diproses sepenuhnya di perangkat Anda
       </p>
       <button type="button" className="btn-eink btn-eink--inverted" onClick={pick} disabled={busy}>
         Pilih Berkas

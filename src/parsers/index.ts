@@ -6,6 +6,7 @@ import { parseMarkdown } from './markdown'
 import { parseText } from './text'
 import { parseDocx } from './docx'
 import { parseSpreadsheet } from './spreadsheet'
+import { parsePdf } from './pdf'
 import { fetchArticle, parseArticleHtml } from './url'
 import { ocrImageToBlocks, type OcrOptions } from './ocr'
 
@@ -13,6 +14,7 @@ export { parseMarkdown } from './markdown'
 export { parseText } from './text'
 export { parseDocx } from './docx'
 export { parseSpreadsheet } from './spreadsheet'
+export { parsePdf } from './pdf'
 export { htmlToBlocks } from './htmlToBlocks'
 export { articleToBlocks, parseArticleHtml, fetchArticle } from './url'
 export type { ArticleResult } from './url'
@@ -21,8 +23,8 @@ export type { OcrOptions } from './ocr'
 export { parseImagesToBook } from './imageBook'
 export type { ImageBookOptions } from './imageBook'
 
-/** Format sumber yang didukung Fase 1. */
-export type SourceFormat = 'docx' | 'markdown' | 'text' | 'csv' | 'xlsx'
+/** Format sumber yang didukung. */
+export type SourceFormat = 'docx' | 'markdown' | 'text' | 'csv' | 'xlsx' | 'pdf'
 
 export interface AssembleOptions {
   baseName: string
@@ -96,6 +98,8 @@ export function detectFormat(filename: string): SourceFormat | null {
     case 'xlsx':
     case 'xls':
       return 'xlsx'
+    case 'pdf':
+      return 'pdf'
     default:
       return null
   }
@@ -131,6 +135,9 @@ export async function parseFile(file: File): Promise<DocumentIR> {
       break
     case 'xlsx':
       blocks = await parseSpreadsheet(await file.arrayBuffer())
+      break
+    case 'pdf':
+      blocks = await parsePdf(await file.arrayBuffer())
       break
   }
 

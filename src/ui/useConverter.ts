@@ -113,7 +113,21 @@ export function useConverter() {
     [resetOutput],
   )
 
-  const loadFile = useCallback((file: File) => runParse(() => parseFile(file), file.name), [runParse])
+  const loadFile = useCallback(
+    (file: File) => {
+      // Kondisi/rekomendasi PDF: teks diekstrak langsung; PDF hasil pindai
+      // (tanpa lapisan teks) perlu OCR. Diberitahu di app saat PDF dipilih.
+      if (/\.pdf$/i.test(file.name)) {
+        pushToast(
+          'Mengekstrak teks PDF… Jika ini PDF hasil pindai (tanpa teks), pakai tab Gambar (OCR) atau Gambar (Buku).',
+          'info',
+          7000,
+        )
+      }
+      return runParse(() => parseFile(file), file.name)
+    },
+    [runParse],
+  )
 
   /** Muat preset Pustaka (repo publik / bawaan) -> DocumentIR. */
   const loadPreset = useCallback(
