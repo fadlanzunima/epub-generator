@@ -57,9 +57,26 @@ rekomendasi per-sumber. Tanda: 🔔 = sudah diberitahu di app (toast/banner), �
 - Build asinkron (non-blocking) + notifikasi saat selesai. 🔔 **Catatan**: subset font **CJK**
   (10–18 MB) masih sinkron → bisa freeze UI sesaat untuk dokumen CJK besar (belum dipindah Web Worker).
 - Build butuh fetch `/fonts/` + `hb-subset.wasm` (lazy); offline pertama kali sebelum ter-cache → embed bisa gagal.
+- **Mode Hemat Memori** 🔔 (tombol *Hemat RAM*, auto bila `deviceMemory ≤ 2GB`): menyembunyikan
+  **OCR** & **embed font CJK** (fitur paling boros RAM) agar lancar di E-Ink/HP kecil. Konversi
+  `.docx/.md/.txt/.csv/.xlsx/.pdf`, URL, Image-Book, & embed font Latin/Arab tetap jalan.
 
 ## E. Validitas
 - Keluaran **EPUB 3.0 standar, lulus epubcheck 5.1.0** → terbaca di eReader Android (Bigme, Onyx
   Boox, Meebook, Boyue) via reader bawaan / KOReader / Moon+ Reader / ReadEra, juga Kobo & (via
   Send-to-Kindle) Kindle. Font Arab/Qur'an di-embed → tampil benar tanpa font perangkat.
 - **Inline SVG** hanya untuk ligatur tertentu (﷽ ﷺ ﷻ); kaligrafi/simbol lain tak dikonversi.
+
+## F. Kompatibilitas peramban 🔔
+- Aplikasi butuh peramban **modern** (ES Modules, WebAssembly, Worker, Canvas, Blob). Peramban
+  sangat lama — mis. **browser bawaan Kindle lama (Experimental Browser)** — tidak didukung:
+  app mendeteksi & menampilkan **pesan panduan** (buat di HP/PC lalu kirim `.epub` via
+  Send-to-Kindle), bukan layar kosong. **Berkas EPUB hasilnya tetap kompatibel** dengan Kindle lama.
+- Didukung baik: Chrome/Edge/Firefox/Safari terbaru, termasuk **E-Ink Android** (Bigme/Onyx/Meebook)
+  dengan WebView modern. RAM 2GB cukup untuk pemakaian normal (lihat Mode Hemat Memori di atas).
+
+## G. Telemetri (opsional) 🔔(README)
+- Bila di-deploy dengan env `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`, app mengirim **ringkasan
+  event build** (attempt/success/fail) ke Telegram pemilik: judul, ukuran, sumber, skrip, jumlah
+  bab, user-agent, waktu. **Isi dokumen TIDAK dikirim.** Tanpa env → endpoint `/api/report` no-op
+  (tak ada data terkirim) sehingga app tetap sepenuhnya privat secara bawaan.

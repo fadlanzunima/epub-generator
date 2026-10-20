@@ -2,6 +2,41 @@
 
 Acuan produk: [BRIEF.md](BRIEF.md). Catatan yang memengaruhi hasil: [CATATAN-KONVERSI.md](CATATAN-KONVERSI.md).
 
+## 2026-10-20 — Deploy Vercel, kompatibilitas perangkat & telemetri
+
+### Deploy
+- **Konfigurasi Vercel** (`vercel.json`): framework Vite, output `dist`, header
+  `Cache-Control: no-cache` untuk `sw.js` & `manifest.webmanifest` (PWA `autoUpdate`)
+  + `Service-Worker-Allowed: /`.
+
+### Kompatibilitas perangkat
+- **Fallback peramban tak didukung** (`index.html` + `main.tsx`): deteksi fitur inti
+  ES5-safe (Promise/fetch/Blob/Uint8Array/Canvas) + `<script nomodule>` → peramban lama
+  (mis. browser bawaan **Kindle lama**) menampilkan **pesan panduan Send-to-Kindle**
+  alih-alih layar kosong; React tak di-mount bila tak didukung.
+- **Mode Hemat Memori** (`useLowMemory`): tombol *Hemat RAM* di header, **auto-aktif**
+  bila `navigator.deviceMemory ≤ 2GB` (pilihan tersimpan di localStorage). Saat aktif,
+  fitur boros memori disembunyikan: **tab OCR** & **picker font CJK** (serta reset
+  `cjkFontId`), untuk E-Ink/HP RAM kecil.
+
+### UI
+- **Font tombol responsif**: `text-button-sm` (14px) di mobile, 16px (`sm:`) di atasnya —
+  label panjang (tab, pilihan CJK) tak lagi membungkus 2 baris.
+
+### Telemetri (opsional, mati bawaan)
+- **Laporan build ke Telegram** via `api/report.ts` (Vercel Edge Function): event
+  **attempt/success/fail** diteruskan ke bot (token & chat id dari env
+  `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`; tanpa env → no-op). Klien kirim fire-and-forget
+  (`src/ui/telemetry.ts`, `fetch keepalive` + header `x-epub-report`). Hanya **metadata**
+  (judul, ukuran, sumber, skrip, jumlah bab, user-agent, waktu) — **isi dokumen tidak dikirim**.
+  Pembantu setup: `npm run telegram:setup`.
+
+### Deviasi dari brief (baru)
+- **Telemetri** bertentangan dengan "privasi data terjaga" bila diaktifkan — bersifat
+  **opt-in via env** & diungkapkan di README/CATATAN; isi dokumen tetap tak dikirim.
+- **Button 16px** (brief) → kini **14px di mobile**, 16px di layar lebih besar (permintaan
+  pengguna; lebih pas untuk layar sempit E-Ink).
+
 ## 2026-10-20 — Penuntasan fitur brief, Android, notifikasi & PDF
 
 ### Sumber masukan
