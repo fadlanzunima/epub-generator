@@ -32,6 +32,31 @@ Di ponsel/eReader tampil satu kolom. Masukan lewat **Berkas / URL / OCR / Gambar
 |:---:|:---:|:---:|
 | ![Onboarding walkthrough](docs/screenshots/01-onboarding.png) | ![Panel masukan & Pustaka Siap-Pakai](docs/screenshots/02-input.png) | ![Live Simulator mode Halaman](docs/screenshots/04-simulator.png) |
 
+### Sorotan fitur — tampilan ponsel
+
+Satu kolom, tombol besar ramah sentuh E-Ink; setiap fitur baru di layar HP:
+
+| Image-Book Mode + 4 sumber masukan | Live Simulator · mode Halaman (page-flip) |
+|:---:|:---:|
+| ![Tab Gambar (Buku): 1 gambar = 1 halaman, grayscale](docs/screenshots/mobile-imagebook.png) | ![Simulator mode Halaman dengan navigasi Prev/Next](docs/screenshots/mobile-simulator.png) |
+| **Font: CJK on-demand (SC/JP/KR) + Custom Upload** | **Build selesai → Kirim ke Kindle + QR** |
+| ![Pemilih font CJK unduh-saat-build & unggah .ttf/.otf](docs/screenshots/mobile-cjk.png) | ![Transfer: unduh, Web Share, Send-to-Kindle, QR](docs/screenshots/mobile-kindle.png) |
+
+### Hasil ter-generate & kompatibilitas Android E-Ink (Bigme, Onyx, dll.)
+
+Keluaran adalah **EPUB 3.0 standar yang lulus epubcheck resmi IDPF/W3C** — bukan format
+khusus. Karena valid & reflowable, berkas yang sama terbaca di **eReader Android** seperti
+**Bigme, Onyx Boox, Meebook, Boyue** lewat reader bawaan (NeoReader) atau aplikasi
+(**KOReader, Moon+ Reader, ReadEra, Librera**), juga di Kobo dan — via Send-to-Kindle —
+di Kindle. Font Arab/Qur'an **disematkan di dalam berkas** (OEBPS/fonts/ + `@font-face`),
+jadi tampil benar walau perangkat tak punya fontnya. Di bawah: pratinjau WYSIWYG **file yang
+ter-generate** (Juz Amma dari quran.com, teks Uthmani RTL) pada bingkai **Bigme/Android**, dan
+berkas `.epub` siap unduh:
+
+| Pratinjau file ter-generate — tab Bigme (Android E-Ink) | Berkas `.epub` siap diunduh/transfer |
+|:---:|:---:|
+| ![Juz Amma RTL pada simulator Bigme](docs/screenshots/mobile-android-arab.png) | ![EPUB 96.7 KB siap unduh](docs/screenshots/mobile-result.png) |
+
 ## Prinsip Arsitektur
 
 - **100% client-side** — tanpa backend; seluruh proses di RAM browser.

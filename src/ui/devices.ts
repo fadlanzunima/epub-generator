@@ -9,7 +9,7 @@ import { buildReadingCss, buildFontFaceCss, fontsForScript } from '@fonts'
  * Arab/non-Latin tetap memakai stack-nya sendiri agar harakat benar).
  */
 export interface Device {
-  id: 'kindle' | 'kobo' | 'onyx'
+  id: 'kindle' | 'kobo' | 'onyx' | 'bigme'
   name: string
   /** Rasio layar (lebar / tinggi). E-Ink umumnya ~0.75 (4:3). */
   aspect: number
@@ -45,6 +45,14 @@ export const DEVICES: Device[] = [
     baseFontPx: 16,
     deviceFont: '"Literata", Georgia, serif',
     note: 'Onyx Boox / Meebook',
+  },
+  {
+    id: 'bigme',
+    name: 'Bigme',
+    aspect: 0.75,
+    baseFontPx: 16,
+    deviceFont: '"Noto Serif", Georgia, serif',
+    note: 'Bigme · Android E-Ink (NeoReader/KOReader)',
   },
 ]
 
