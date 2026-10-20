@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 /*
+ * Font UI = Literata (serif ramah-baca, nuansa eReader/buku) — di-embed sebagai
+ * web font (woff2 latin, ~42 KB total) agar tampilan konsisten di semua perangkat
+ * tanpa bergantung font sistem. Sama dengan font konten EPUB Latin → kohesif.
+ */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/literata-latin-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/literata-latin-700.woff2') format('woff2');
+}
+
+/*
  * Design tokens E-Ink (CSS variables) — dipakai juga oleh Immersion Mode
  * untuk menukar nuansa UI secara instan (Warm Paper <-> Pure Grayscale).
  */
@@ -33,9 +53,10 @@
     margin: 0;
     background-color: var(--paper);
     color: var(--ink);
-    font-family: Inter, Roboto, 'Noto Sans', system-ui, sans-serif;
-    /* Kontras tajam, tanpa anti-alias berlebih yang memburamkan e-ink */
-    -webkit-font-smoothing: none;
+    /* Serif ramah-baca ala eReader/buku */
+    font-family: 'Literata', 'Charis SIL', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 

@@ -12,6 +12,11 @@ pada tautan masing-masing.
 | `ScheherazadeNew-Regular.ttf` | Scheherazade New | Arab | SIL Open Font License 1.1 | https://software.sil.org/scheherazade/ |
 | `Literata-Regular.ttf` | Literata | Latin/Kiril | SIL Open Font License 1.1 | https://github.com/googlefonts/literata |
 | `Literata-Bold.ttf` | Literata | Latin/Kiril | SIL Open Font License 1.1 | https://github.com/googlefonts/literata |
+| `literata-latin-400.woff2` | Literata | Latin (UI) | SIL Open Font License 1.1 | https://github.com/googlefonts/literata |
+| `literata-latin-700.woff2` | Literata | Latin (UI) | SIL Open Font License 1.1 | https://github.com/googlefonts/literata |
+
+`.ttf` dipakai untuk disematkan ke EPUB (bisa di-subset); `.woff2` ringan dipakai
+sebagai font antarmuka aplikasi (UI).
 
 Font di bawah SIL OFL 1.1 boleh digunakan, dimodifikasi (termasuk subsetting),
 dan disematkan ke dokumen secara bebas. Lihat https://openfontlicense.org/.

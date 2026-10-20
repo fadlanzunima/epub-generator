@@ -38,7 +38,8 @@ export default {
     },
     // Tipografi sesuai brief: UI sans-serif tajam, konten serif ramah mata, Arab Naskh.
     fontFamily: {
-      ui: ['Inter', 'Roboto', 'Noto Sans', 'system-ui', 'sans-serif'],
+      // UI & reader sama-sama Literata serif (nuansa eReader/buku, kohesif dengan EPUB).
+      ui: ['Literata', 'Charis SIL', 'Georgia', 'serif'],
       reader: ['Literata', 'Bookerly', 'Charis SIL', 'Georgia', 'serif'],
       arabic: ['"LPMQ Isep Misbah"', '"KFGQPC Uthmanic Hafs"', '"Amiri Quran"', '"Scheherazade New"', 'serif'],
     },
