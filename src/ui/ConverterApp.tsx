@@ -2,6 +2,7 @@
  * Alur konversi Fase 4: Unggah -> Pratinjau & Metadata -> Sampul -> Build -> Unduh.
  * Satu layar linear, ramah E-Ink (border tegas, tanpa animasi). 100% client-side.
  */
+import { useEffect, useState } from 'react'
 import { InputPanel } from './InputPanel'
 import { StarterLibrary } from './StarterLibrary'
 import { CoverPanel } from './CoverPanel'
@@ -58,6 +59,12 @@ export function ConverterApp() {
   const isImageBook = c.ir?.meta.source === 'image-book'
   // Dual-Pane hanya bila ada pratinjau (bukan Image-Book) — jika tidak, satu kolom.
   const twoPane = loaded && !isImageBook && Boolean(c.ir?.chapters[0])
+
+  // Bab yang sedang dipratinjau di Live Simulator (diklik dari Daftar Bab).
+  const [previewIndex, setPreviewIndex] = useState(0)
+  useEffect(() => setPreviewIndex(0), [c.ir])
+  const chapterCount = c.ir?.chapters.length ?? 0
+  const activeIndex = Math.min(previewIndex, Math.max(0, chapterCount - 1))
 
   return (
     <>
@@ -149,7 +156,7 @@ export function ConverterApp() {
                   <Field id="title" label="Judul" value={c.title} onChange={c.setTitle} placeholder="Judul buku" />
                   <Field id="author" label="Penulis" value={c.author} onChange={c.setAuthor} placeholder="(opsional)" />
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="flex flex-col gap-4">
                     <label htmlFor="lang" className="flex flex-col gap-1.5">
                       <span className="font-ui text-body text-ink-muted">Bahasa</span>
                       <select
@@ -213,15 +220,34 @@ export function ConverterApp() {
               </Section>
 
               <Section title="Daftar Bab">
-                <ol className="flex flex-col gap-1">
-                  {c.ir.chapters.map((chap, i) => (
-                    <li key={chap.id} className="flex items-baseline justify-between border-b border-paper-line py-1.5 last:border-0">
-                      <span className="font-ui text-body-lg text-ink">
-                        <span className="text-ink-faint">{i + 1}.</span> {chap.title}
-                      </span>
-                      <span className="font-ui text-body text-ink-faint">{chap.blocks.length} blok</span>
-                    </li>
-                  ))}
+                {twoPane && (
+                  <p className="mb-2 font-ui text-body text-ink-faint">
+                    Ketuk bab untuk melihatnya di Live Simulator.
+                  </p>
+                )}
+                <ol className="flex flex-col">
+                  {c.ir.chapters.map((chap, i) => {
+                    const active = twoPane && i === activeIndex
+                    return (
+                      <li key={chap.id} className="border-b border-paper-line last:border-0">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewIndex(i)}
+                          aria-pressed={active}
+                          className={`flex w-full items-baseline justify-between gap-2 px-2 py-1.5 text-left
+                                      ${active ? 'bg-black text-white' : 'bg-transparent'}
+                                      focus-visible:outline-none focus-visible:border-dashed focus-visible:border-eink`}
+                        >
+                          <span className={`font-ui text-body-lg ${active ? 'text-white' : 'text-ink'}`}>
+                            <span className={active ? 'text-white' : 'text-ink-faint'}>{i + 1}.</span> {chap.title}
+                          </span>
+                          <span className={`shrink-0 font-ui text-body ${active ? 'text-white' : 'text-ink-faint'}`}>
+                            {chap.blocks.length} blok
+                          </span>
+                        </button>
+                      </li>
+                    )
+                  })}
                 </ol>
               </Section>
 
@@ -295,14 +321,15 @@ export function ConverterApp() {
               </Section>
             </div>
 
-            {twoPane && c.ir.chapters[0] && (
+            {twoPane && c.ir.chapters[activeIndex] && (
               <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-8">
                 <Section title="Pratinjau (Live Simulator)">
                   <Simulator
-                    chapter={c.ir.chapters[0]}
+                    chapter={c.ir.chapters[activeIndex]}
                     script={c.ir.meta.script}
                     direction={c.ir.meta.direction}
                     lang={c.ir.meta.language}
+                    title={c.title}
                   />
                 </Section>
               </div>

@@ -32,6 +32,15 @@ Acuan produk: [BRIEF.md](BRIEF.md). Catatan yang memengaruhi hasil: [CATATAN-KON
   **relatif lebar cover** (pratinjau kecil = ekspor besar, WYSIWYG), blok judul diklem agar
   tak terpotong di atas. Guard regresi di smoke (105) & validate (134, +dc:publisher/description/subject).
 
+### Perbaikan tata letak (anti-overflow) & kosmetik perangkat
+- **Fix overflow** di dual-pane (kolom sempit): tombol Metadata (Bahasa/Arah baca jadi
+  full-width stacked), kartu Gaya Sampul & tombol mode Simulator (`min-w-0` + susun ulang
+  baris) tak lagi terpotong.
+- **Live Simulator ala perangkat asli**: bezel membulat border tipis (kiri/kanan/atas) +
+  "dagu" bermerek (kindle/kobo/BOOX/Bigme) + **judul buku sebagai keterangan kosmetik** di
+  bawah bingkai.
+- **Daftar Bab bisa diklik** → bab yang dipilih tampil di Live Simulator (bab aktif disorot).
+
 ### UI/UX
 - **Dual-Pane** layar lebar (editor kiri, Live Simulator sticky kanan); satu kolom di HP.
 - **Live Simulator**: mode **Gulir** & **Halaman** (page-flip ketuk) + device **Bigme**

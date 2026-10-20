@@ -22,11 +22,14 @@ export function Simulator({
   script,
   direction,
   lang,
+  title,
 }: {
   chapter: Chapter
   script: ScriptHint
   direction: TextDirection
   lang: string
+  /** Judul buku — ditampilkan sebagai keterangan kosmetik di bawah perangkat. */
+  title?: string
 }) {
   const [device, setDevice] = useState<Device>(DEVICES[0])
   const [fontScale, setFontScale] = useState(1)
@@ -107,77 +110,85 @@ export function Simulator({
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex gap-2" role="group" aria-label="Mode baca">
-          <SegmentedOption active={mode === 'scroll'} onClick={() => setMode('scroll')}>
-            Gulir
-          </SegmentedOption>
-          <SegmentedOption active={mode === 'page'} onClick={() => setMode('page')}>
-            Halaman
-          </SegmentedOption>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="font-ui text-body text-ink-muted">Font</span>
-          <button
-            type="button"
-            className="btn-eink min-h-tap px-4"
-            onClick={() => setFontScale((s) => Math.max(MIN_SCALE, +(s - STEP).toFixed(1)))}
-            disabled={fontScale <= MIN_SCALE}
-            aria-label="Perkecil font"
-          >
-            A−
-          </button>
-          <span className="w-12 text-center font-ui text-body text-ink">{Math.round(fontScale * 100)}%</span>
-          <button
-            type="button"
-            className="btn-eink min-h-tap px-4"
-            onClick={() => setFontScale((s) => Math.min(MAX_SCALE, +(s + STEP).toFixed(1)))}
-            disabled={fontScale >= MAX_SCALE}
-            aria-label="Perbesar font"
-          >
-            A+
-          </button>
-        </div>
+      <div className="flex gap-2" role="group" aria-label="Mode baca">
+        <SegmentedOption active={mode === 'scroll'} onClick={() => setMode('scroll')}>
+          Gulir
+        </SegmentedOption>
+        <SegmentedOption active={mode === 'page'} onClick={() => setMode('page')}>
+          Halaman
+        </SegmentedOption>
       </div>
 
-      {/* Bingkai perangkat E-Ink: bezel tebal hitam, layar putih */}
-      <div className="flex flex-col items-center gap-2">
-        <div className="relative border-eink border-black bg-black p-3" style={{ width: DISPLAY_WIDTH + 24 }}>
-          <iframe
-            ref={iframeRef}
-            title={`Pratinjau ${device.name}`}
-            srcDoc={srcDoc}
-            onLoad={measure}
-            // allow-same-origin agar @font-face /fonts/ termuat & parent bisa
-            // mengukur/menggeser halaman. Tanpa allow-scripts: JS konten tetap
-            // diblokir — aman dari XSS.
-            sandbox="allow-same-origin"
-            className="block border-0 bg-white"
-            style={{ width: DISPLAY_WIDTH, height: screenHeight }}
-            scrolling={paged ? 'no' : 'auto'}
-          />
-          {/* Zona ketuk halaman (hanya mode Halaman) — menumpuk di atas iframe. */}
-          {paged && (
-            <div className="absolute inset-3 flex" aria-hidden="true">
-              <button
-                type="button"
-                className="h-full w-1/2 cursor-w-resize bg-transparent"
-                onClick={onLeftTap}
-                aria-label="Halaman sebelumnya"
-                tabIndex={-1}
-              />
-              <button
-                type="button"
-                className="h-full w-1/2 cursor-e-resize bg-transparent"
-                onClick={onRightTap}
-                aria-label="Halaman berikutnya"
-                tabIndex={-1}
-              />
-            </div>
-          )}
+      <div className="flex items-center justify-center gap-2">
+        <span className="font-ui text-body text-ink-muted">Font</span>
+        <button
+          type="button"
+          className="btn-eink min-h-tap px-4"
+          onClick={() => setFontScale((s) => Math.max(MIN_SCALE, +(s - STEP).toFixed(1)))}
+          disabled={fontScale <= MIN_SCALE}
+          aria-label="Perkecil font"
+        >
+          A−
+        </button>
+        <span className="w-12 text-center font-ui text-body text-ink">{Math.round(fontScale * 100)}%</span>
+        <button
+          type="button"
+          className="btn-eink min-h-tap px-4"
+          onClick={() => setFontScale((s) => Math.min(MAX_SCALE, +(s + STEP).toFixed(1)))}
+          disabled={fontScale >= MAX_SCALE}
+          aria-label="Perbesar font"
+        >
+          A+
+        </button>
+      </div>
+
+      {/* Bingkai ala e-reader: bezel membulat tebal + "dagu" bermerek (kosmetik) */}
+      <div className="flex flex-col items-center gap-3">
+        <div
+          className="rounded-[16px] border-eink border-black bg-black px-1.5 pt-1.5 pb-6"
+          style={{ width: DISPLAY_WIDTH + 12 }}
+        >
+          <div className="relative overflow-hidden rounded-[5px]">
+            <iframe
+              ref={iframeRef}
+              title={`Pratinjau ${device.name}`}
+              srcDoc={srcDoc}
+              onLoad={measure}
+              // allow-same-origin agar @font-face /fonts/ termuat & parent bisa
+              // mengukur/menggeser halaman. Tanpa allow-scripts: JS konten tetap
+              // diblokir — aman dari XSS.
+              sandbox="allow-same-origin"
+              className="block border-0 bg-white"
+              style={{ width: DISPLAY_WIDTH, height: screenHeight }}
+              scrolling={paged ? 'no' : 'auto'}
+            />
+            {/* Zona ketuk halaman (hanya mode Halaman) — menumpuk di atas iframe. */}
+            {paged && (
+              <div className="absolute inset-0 flex" aria-hidden="true">
+                <button
+                  type="button"
+                  className="h-full w-1/2 cursor-w-resize bg-transparent"
+                  onClick={onLeftTap}
+                  aria-label="Halaman sebelumnya"
+                  tabIndex={-1}
+                />
+                <button
+                  type="button"
+                  className="h-full w-1/2 cursor-e-resize bg-transparent"
+                  onClick={onRightTap}
+                  aria-label="Halaman berikutnya"
+                  tabIndex={-1}
+                />
+              </div>
+            )}
+          </div>
+          {/* Dagu perangkat: label merek (kosmetik) */}
+          <div className="pt-2 text-center font-ui text-body uppercase tracking-[0.3em] text-white/70">
+            {device.brand}
+          </div>
         </div>
 
-        {paged ? (
+        {paged && (
           <div className="flex items-center gap-3">
             <button type="button" className="btn-eink px-4" onClick={goPrev} disabled={page <= 0}>
               ‹ Prev
@@ -194,9 +205,17 @@ export function Simulator({
               Next ›
             </button>
           </div>
-        ) : (
-          <span className="font-ui text-body text-ink-faint">{device.note}</span>
         )}
+
+        {/* Keterangan kosmetik: judul buku + perangkat yang disimulasikan */}
+        <div className="flex flex-col items-center text-center">
+          <span className="max-w-[260px] font-ui text-subtitle text-ink">
+            {(title ?? '').trim() || chapter.title}
+          </span>
+          <span className="font-ui text-body text-ink-faint">
+            {device.name} · {device.note}
+          </span>
+        </div>
       </div>
     </div>
   )

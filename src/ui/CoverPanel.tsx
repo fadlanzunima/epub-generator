@@ -95,14 +95,14 @@ export function CoverPanel({
       </div>
 
       {mode === 'auto' && (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-1">
             <CoverCanvas title={title} author={author} theme={theme} width={160} />
             <span className="font-ui text-body text-ink-faint">Pratinjau</span>
           </div>
-          <div className="flex flex-1 flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <span className="font-ui text-body-lg text-ink">Gaya Sampul</span>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {STYLES.map((s) => {
                 const active = theme === s.id
                 return (
@@ -111,12 +111,14 @@ export function CoverPanel({
                     type="button"
                     onClick={() => onTheme(s.id)}
                     aria-pressed={active}
-                    className={`flex items-center gap-3 border-eink border-black p-2 text-left
+                    className={`flex min-w-0 items-center gap-3 border-eink border-black p-2 text-left
                                 ${active ? 'bg-black text-white' : 'bg-white text-black'}
                                 focus-visible:outline-none focus-visible:border-dashed`}
                   >
-                    <CoverCanvas title={title} theme={s.id} width={38} />
-                    <span className="flex flex-col">
+                    <span className="shrink-0">
+                      <CoverCanvas title={title} theme={s.id} width={34} />
+                    </span>
+                    <span className="flex min-w-0 flex-col">
                       <span className="font-ui text-button">{s.label}</span>
                       <span className={`font-ui text-body ${active ? 'text-white' : 'text-ink-muted'}`}>
                         {s.desc}

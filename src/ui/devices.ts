@@ -19,6 +19,8 @@ export interface Device {
   deviceFont: string
   /** Catatan kecil di bawah bingkai. */
   note: string
+  /** Label merek pada "dagu" bingkai (kosmetik, meniru perangkat asli). */
+  brand: string
 }
 
 export const DEVICES: Device[] = [
@@ -29,6 +31,7 @@ export const DEVICES: Device[] = [
     baseFontPx: 17,
     deviceFont: 'Georgia, "Times New Roman", serif', // simulasi Bookerly
     note: 'Amazon · simulasi Bookerly',
+    brand: 'kindle',
   },
   {
     id: 'kobo',
@@ -37,6 +40,7 @@ export const DEVICES: Device[] = [
     baseFontPx: 17,
     deviceFont: '"Palatino Linotype", Georgia, serif',
     note: 'Rakuten Kobo',
+    brand: 'kobo',
   },
   {
     id: 'onyx',
@@ -45,6 +49,7 @@ export const DEVICES: Device[] = [
     baseFontPx: 16,
     deviceFont: '"Literata", Georgia, serif',
     note: 'Onyx Boox / Meebook',
+    brand: 'BOOX',
   },
   {
     id: 'bigme',
@@ -53,6 +58,7 @@ export const DEVICES: Device[] = [
     baseFontPx: 16,
     deviceFont: '"Noto Serif", Georgia, serif',
     note: 'Bigme · Android E-Ink (NeoReader/KOReader)',
+    brand: 'Bigme',
   },
 ]
 

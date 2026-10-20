@@ -95,7 +95,7 @@ export function OptionCard({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`flex min-h-tap flex-1 flex-col items-start justify-center gap-0.5 border-eink border-black px-4 py-2 text-left
+      className={`flex min-h-tap min-w-0 flex-1 flex-col items-start justify-center gap-0.5 border-eink border-black px-4 py-2 text-left
                   ${active ? 'bg-black text-white' : 'bg-white text-black'}
                   disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-paper-soft disabled:text-ink-faint
                   focus-visible:outline-none focus-visible:border-dashed`}
@@ -124,7 +124,7 @@ export function SegmentedOption({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`min-h-tap flex-1 border-eink border-black px-3 font-ui text-button
+      className={`min-h-tap min-w-0 flex-1 border-eink border-black px-3 font-ui text-button
                   ${active ? 'bg-black text-white' : 'bg-white text-black'}
                   disabled:text-ink-faint disabled:border-gray-400 disabled:bg-paper-soft disabled:cursor-not-allowed
                   focus-visible:outline-none focus-visible:border-dashed`}
