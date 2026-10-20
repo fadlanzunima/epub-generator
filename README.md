@@ -5,11 +5,24 @@ Aplikasi **PWA 100% client-side, Non-AI, gratis** untuk mengubah dokumen
 **EPUB 3.0 valid** yang dioptimalkan untuk layar **E-Ink** (Kindle, Kobo,
 Onyx Boox, Meebook), dengan dukungan penuh skrip **Arab/Qur'an (RTL + font embed)**.
 
-> Status: **Fase 1–6 selesai** — mesin konversi (parsers · fonts · epub · cover),
-> antarmuka E-Ink (Unggah → Metadata → Sampul → Build → Unduh), Live Simulator +
-> Immersion Mode, dan PWA (offline · install · Web Share · QR) berjalan 100% client-side.
-> Font Arab/Qur'an (LPMQ Isep Misbah dkk) di-embed nyata. Sisa opsional: subsetter font,
-> onboarding walkthrough, parser URL/OCR.
+> Status: **Lengkap & tervalidasi.** Mesin konversi (parsers · fonts · epub · cover),
+> antarmuka E-Ink (Unggah → Metadata → Sampul → Build → Transfer), Live Simulator +
+> Immersion Mode + onboarding, parser URL (Readability) & OCR (Tesseract), subsetting
+> font HarfBuzz, dan PWA (offline · install · Web Share · QR) — semua 100% client-side.
+> EPUB hasil **lulus epubcheck resmi IDPF/W3C (0 error)**.
+
+## Tampilan
+
+Alur konversi lengkap — unggah dokumen, periksa metadata & bab, pratinjau WYSIWYG di
+**Live Simulator** (Kindle/Kobo/Onyx), pilih sampul, lalu bangun EPUB — semua di perangkat:
+
+<p align="center">
+  <img src="docs/screenshots/03-convert.png" alt="Alur konversi EPUB Builder" width="430">
+</p>
+
+| Onboarding | Live Simulator | Panel Masukan |
+|:---:|:---:|:---:|
+| ![Onboarding walkthrough](docs/screenshots/01-onboarding.png) | ![Live Simulator E-Ink](docs/screenshots/04-simulator.png) | ![Panel masukan: Berkas / URL / OCR](docs/screenshots/02-input.png) |
 
 ## Prinsip Arsitektur
 
