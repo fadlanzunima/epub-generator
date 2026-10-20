@@ -16,6 +16,7 @@ import { useConverter } from './useConverter'
 import { useImmersion } from './useImmersion'
 import { useOnboarding } from './useOnboarding'
 import { useOnline } from './useOnline'
+import { useLowMemory } from './useLowMemory'
 import { Toasts } from './Toasts'
 import { pushToast } from './toast'
 import { CJK_FONT_CHOICES } from '@fonts'
@@ -54,6 +55,7 @@ export function ConverterApp() {
   const immersion = useImmersion()
   const onboarding = useOnboarding()
   const online = useOnline()
+  const lowMem = useLowMemory()
   const busy = c.status === 'parsing' || c.status === 'building'
   const loaded = c.ir !== null
   const isImageBook = c.ir?.meta.source === 'image-book'
@@ -63,6 +65,13 @@ export function ConverterApp() {
   // Bab yang sedang dipratinjau di Live Simulator (diklik dari Daftar Bab).
   const [previewIndex, setPreviewIndex] = useState(0)
   useEffect(() => setPreviewIndex(0), [c.ir])
+
+  // Mode Hemat Memori: batalkan embed font CJK yang mungkin sudah dipilih
+  // (picker-nya disembunyikan) agar build tak mengunduh font besar.
+  const setCjkFontId = c.setCjkFontId
+  useEffect(() => {
+    if (lowMem.on) setCjkFontId(null)
+  }, [lowMem.on, setCjkFontId])
   const chapterCount = c.ir?.chapters.length ?? 0
   const activeIndex = Math.min(previewIndex, Math.max(0, chapterCount - 1))
 
@@ -82,7 +91,7 @@ export function ConverterApp() {
             Data&nbsp;→&nbsp;eReader · Non-AI · 100% Client-Side
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <button
             type="button"
             className="btn-eink px-4"
@@ -91,6 +100,15 @@ export function ConverterApp() {
             aria-label="Buka panduan"
           >
             ?
+          </button>
+          <button
+            type="button"
+            className={`btn-eink px-4 ${lowMem.on ? 'btn-eink--inverted' : ''}`}
+            onClick={lowMem.toggle}
+            aria-pressed={lowMem.on}
+            title="Mode Hemat Memori: sembunyikan OCR & font CJK (untuk perangkat RAM kecil, mis. E-Ink 2GB)"
+          >
+            {lowMem.on ? '◼ Hemat RAM' : '◻ Hemat RAM'}
           </button>
           <button
             type="button"
@@ -119,6 +137,7 @@ export function ConverterApp() {
           <InputPanel
             busy={busy}
             online={online}
+            lowMemory={lowMem.on}
             ocrProgress={c.ocrProgress}
             onFile={c.loadFile}
             onUrl={c.loadUrl}
@@ -277,7 +296,16 @@ export function ConverterApp() {
                       Sematkan font (embed) — penting untuk skrip Arab/non-Latin
                     </span>
                   </label>
-                  {c.ir.meta.script === 'cjk' && (
+                  {c.ir.meta.script === 'cjk' && lowMem.on && (
+                    <div className="border-t border-paper-line pt-4">
+                      <Alert tone="warning">
+                        Mode Hemat Memori aktif — embed font CJK (unduh 9–18 MB lalu subset)
+                        dinonaktifkan. EPUB memakai font CJK bawaan eReader. Matikan Mode Hemat
+                        Memori di atas bila ingin menyematkan font CJK.
+                      </Alert>
+                    </div>
+                  )}
+                  {c.ir.meta.script === 'cjk' && !lowMem.on && (
                     <div className="flex flex-col gap-2 border-t border-paper-line pt-4">
                       <span className="font-ui text-body-lg text-ink">
                         Font CJK (China/Jepang/Korea) — tidak dibundel, unduh saat build

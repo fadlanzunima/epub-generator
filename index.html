@@ -14,6 +14,65 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Pesan fallback untuk peramban tak didukung (mis. browser bawaan Kindle lama).
+         Ditulis dengan gaya inline agar tetap tampil walau bundle aplikasi tak termuat. -->
+    <div
+      id="unsupported"
+      style="display: none; max-width: 640px; margin: 0 auto; padding: 40px 24px; font-family: Georgia, 'Times New Roman', serif; color: #000"
+    >
+      <div style="border: 2px solid #000; background: #fff; padding: 24px">
+        <h1 style="margin: 0 0 12px; font-size: 22px">Peramban tidak didukung</h1>
+        <p style="margin: 0 0 12px; font-size: 16px; line-height: 1.6">
+          <strong>EPUB Builder</strong> memerlukan peramban modern (Chrome, Edge, Firefox, atau
+          Safari terbaru) — termasuk e-reader <strong>Android</strong> seperti Bigme / Onyx Boox.
+        </p>
+        <p style="margin: 0 0 12px; font-size: 16px; line-height: 1.6">
+          Peramban bawaan <strong>Kindle lama</strong> (Experimental Browser) tidak mendukung
+          teknologi yang dibutuhkan aplikasi ini (JavaScript modern, WebAssembly, Worker, Canvas).
+        </p>
+        <p style="margin: 0; font-size: 16px; line-height: 1.6">
+          Solusi: buka aplikasi ini di <strong>ponsel</strong> atau <strong>komputer</strong> untuk
+          membuat EPUB, lalu kirim berkas <strong>.epub</strong> ke Kindle Anda lewat
+          <strong>Send-to-Kindle</strong>. Berkas EPUB-nya sendiri tetap kompatibel dengan Kindle lama.
+        </p>
+      </div>
+    </div>
+
+    <!-- Deteksi fitur (ES5-safe): jalan di semua peramban, termasuk yang sangat tua.
+         Bila API inti tak ada, tampilkan pesan fallback dan jangan mount aplikasi. -->
+    <script>
+      (function () {
+        function supported() {
+          return (
+            typeof window.Promise === 'function' &&
+            typeof window.fetch === 'function' &&
+            typeof window.Blob === 'function' &&
+            typeof window.Uint8Array === 'function' &&
+            typeof document.createElement('canvas').getContext === 'function'
+          )
+        }
+        if (!supported()) {
+          window.__EPUB_UNSUPPORTED__ = true
+          var u = document.getElementById('unsupported')
+          var r = document.getElementById('root')
+          if (u) u.style.display = 'block'
+          if (r) r.style.display = 'none'
+        }
+      })()
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Peramban tanpa dukungan ES Modules (mis. Kindle lama) mengabaikan skrip modul
+         di atas; skrip nomodule ini yang berjalan untuk menampilkan pesan fallback. -->
+    <script nomodule>
+      (function () {
+        var u = document.getElementById('unsupported')
+        var r = document.getElementById('root')
+        if (u) u.style.display = 'block'
+        if (r) r.style.display = 'none'
+      })()
+    </script>
   </body>
 </html>

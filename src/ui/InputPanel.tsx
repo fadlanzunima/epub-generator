@@ -3,7 +3,7 @@
  * dan Gambar/OCR (Tesseract lazy). Semua 100% client-side (kecuali unduhan data
  * latih OCR & fetch URL yang tunduk CORS).
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dropzone } from './Dropzone'
 import { Alert, SegmentedOption } from './primitives'
 
@@ -19,6 +19,7 @@ const OCR_LANGS: { value: string; label: string }[] = [
 export function InputPanel({
   busy,
   online,
+  lowMemory,
   ocrProgress,
   onFile,
   onUrl,
@@ -28,6 +29,8 @@ export function InputPanel({
 }: {
   busy: boolean
   online: boolean
+  /** Mode Hemat Memori: sembunyikan tab OCR (boros RAM). */
+  lowMemory?: boolean
   ocrProgress: number | null
   onFile: (file: File) => void
   onUrl: (url: string) => void
@@ -40,6 +43,11 @@ export function InputPanel({
   const [html, setHtml] = useState('')
   const [lang, setLang] = useState('ind+eng')
 
+  // Jika Mode Hemat Memori dinyalakan saat tab OCR aktif, kembalikan ke Berkas.
+  useEffect(() => {
+    if (lowMemory && tab === 'ocr') setTab('file')
+  }, [lowMemory, tab])
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2" role="group" aria-label="Pilih sumber masukan">
@@ -49,9 +57,11 @@ export function InputPanel({
         <SegmentedOption active={tab === 'url'} onClick={() => setTab('url')} disabled={busy}>
           URL / Artikel
         </SegmentedOption>
-        <SegmentedOption active={tab === 'ocr'} onClick={() => setTab('ocr')} disabled={busy}>
-          Gambar (OCR)
-        </SegmentedOption>
+        {!lowMemory && (
+          <SegmentedOption active={tab === 'ocr'} onClick={() => setTab('ocr')} disabled={busy}>
+            Gambar (OCR)
+          </SegmentedOption>
+        )}
         <SegmentedOption active={tab === 'imagebook'} onClick={() => setTab('imagebook')} disabled={busy}>
           Gambar (Buku)
         </SegmentedOption>
