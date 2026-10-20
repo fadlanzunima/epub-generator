@@ -21,6 +21,17 @@ Acuan produk: [BRIEF.md](BRIEF.md). Catatan yang memengaruhi hasil: [CATATAN-KON
 - **Pustaka Siap-Pakai / Public Repo**: Juz Amma (quran.com API, teks Uthmani ± terjemahan
   Kemenag), UUD 1945 (offline). `src/presets/`.
 
+### Metadata & Sampul (lanjutan)
+- **Metadata lengkap** dapat diedit & ditulis ke OPF (Dublin Core): bahasa (select),
+  **arah baca** LTR/RTL (override, berlaku ke seluruh bab), penerbit (`dc:publisher`),
+  deskripsi (`dc:description`), subjek/kategori (`dc:subject`).
+- **Sampul** pakai tombol-kartu jelas (Buat Otomatis / Unggah Gambar / Tanpa Sampul) +
+  pratinjau WYSIWYG + pemilih Gaya ber-thumbnail nyata (Otomatis/Klasik/Religius/Teknis).
+- **Perbaikan overlap teks cover**: `wrapText` memecah kata panjang (hubung lalu paksa
+  per-huruf), `fitFontSize` memberi elipsis bila tetap kepanjangan, ukuran font kini
+  **relatif lebar cover** (pratinjau kecil = ekspor besar, WYSIWYG), blok judul diklem agar
+  tak terpotong di atas. Guard regresi di smoke (105) & validate (134, +dc:publisher/description/subject).
+
 ### UI/UX
 - **Dual-Pane** layar lebar (editor kiri, Live Simulator sticky kanan); satu kolom di HP.
 - **Live Simulator**: mode **Gulir** & **Halaman** (page-flip ketuk) + device **Bigme**

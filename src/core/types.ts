@@ -38,6 +38,12 @@ export interface DocumentMeta {
   direction: TextDirection
   script: ScriptHint
   source?: string // nama file / URL asal
+  /** dc:publisher — penerbit (opsional). */
+  publisher?: string
+  /** dc:description — deskripsi/sinopsis (opsional). */
+  description?: string
+  /** dc:subject — daftar subjek/kategori/tag (opsional). */
+  subjects?: string[]
 }
 
 /** Representasi lengkap dokumen siap dirakit menjadi EPUB. */

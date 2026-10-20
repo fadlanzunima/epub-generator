@@ -72,6 +72,40 @@ export function Alert({ tone, children }: { tone: AlertTone; children: ReactNode
   )
 }
 
+/**
+ * Tombol-kartu pilihan: judul tegas + deskripsi singkat agar mudah dimengerti
+ * (dipakai untuk mode sampul/metadata). Aktif = inverted. Ramah E-Ink.
+ */
+export function OptionCard({
+  active,
+  onClick,
+  title,
+  desc,
+  disabled,
+}: {
+  active: boolean
+  onClick: () => void
+  title: string
+  desc: string
+  disabled?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={active}
+      className={`flex min-h-tap flex-1 flex-col items-start justify-center gap-0.5 border-eink border-black px-4 py-2 text-left
+                  ${active ? 'bg-black text-white' : 'bg-white text-black'}
+                  disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-paper-soft disabled:text-ink-faint
+                  focus-visible:outline-none focus-visible:border-dashed`}
+    >
+      <span className="font-ui text-button">{title}</span>
+      <span className={`font-ui text-body ${active ? 'text-white' : 'text-ink-muted'}`}>{desc}</span>
+    </button>
+  )
+}
+
 /** Pilihan segmented (radio) ala E-Ink: border tegas, aktif = inverted. */
 export function SegmentedOption({
   active,

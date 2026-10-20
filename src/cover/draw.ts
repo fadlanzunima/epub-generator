@@ -48,17 +48,30 @@ export function drawCoverToCanvas(
     return ctx.measureText(text).width
   }
 
+  // Ukuran font RELATIF terhadap lebar cover agar pratinjau kecil & ekspor besar
+  // membungkus identik (WYSIWYG) — bukan px absolut yang bikin pratinjau sempit.
   const fit = fitFontSize(
     title,
-    { maxWidth: innerWidth, maxHeight: dim.height * 0.5, maxFont: 180, minFont: 48, lineHeightRatio: 1.2, maxLines: 6 },
+    {
+      maxWidth: innerWidth,
+      maxHeight: dim.height * 0.5,
+      maxFont: dim.width * 0.1125, // 180/1600
+      minFont: dim.width * 0.03, // 48/1600
+      lineHeightRatio: 1.2,
+      maxLines: 6,
+    },
     measure,
   )
+
+  // Titik atas blok judul: idealnya terpusat di 30% tinggi, tapi diklem agar
+  // tak pernah naik di atas margin (judul panjang/banyak baris tak terpotong).
+  const blockTop = Math.max(dim.margin, dim.height * 0.3 - fit.blockHeight / 2)
 
   if (theme.ornament === 'rule') {
     ctx.lineWidth = 8
     ctx.beginPath()
-    ctx.moveTo(dim.margin, dim.height * 0.3 - fit.blockHeight / 2 - 40)
-    ctx.lineTo(dim.width - dim.margin, dim.height * 0.3 - fit.blockHeight / 2 - 40)
+    ctx.moveTo(dim.margin, blockTop - 40)
+    ctx.lineTo(dim.width - dim.margin, blockTop - 40)
     ctx.stroke()
   }
 
@@ -67,7 +80,7 @@ export function drawCoverToCanvas(
   ctx.textBaseline = 'middle'
   ctx.textAlign = theme.titleAlign
   const cx = theme.titleAlign === 'center' ? dim.width / 2 : dim.margin
-  let y = dim.height * 0.3 - fit.blockHeight / 2 + fit.lineHeight / 2
+  let y = blockTop + fit.lineHeight / 2
   for (const line of fit.lines) {
     ctx.fillText(line, cx, y)
     y += fit.lineHeight

@@ -157,6 +157,14 @@ const arCss = await arZip.file('OEBPS/styles/content.css')!.async('string')
 ok('Arab CSS: @font-face LPMQ + line-height 2.0 (RTL via dir attr, bukan CSS)',
   /@font-face/.test(arCss) && /LPMQ Isep Misbah/.test(arCss) && /line-height:\s*2\.0/.test(arCss))
 
+// Metadata lanjutan (dc:publisher/description/subject) di EPUB Latin
+console.log('\n=== Metadata lanjutan ===')
+const latinEpub = samples.find((s) => s.name === 'latin')!.bytes
+const latinOpf = await (await JSZip.loadAsync(latinEpub)).file('OEBPS/content.opf')!.async('string')
+ok('OPF dc:publisher ada', /<dc:publisher>Penerbit Uji<\/dc:publisher>/.test(latinOpf))
+ok('OPF dc:description ada', /<dc:description>[^<]+<\/dc:description>/.test(latinOpf))
+ok('OPF dc:subject (>=2)', (latinOpf.match(/<dc:subject>/g) ?? []).length >= 2)
+
 // Image-Book + Inline SVG spesifik
 console.log('\n=== Image-Book + SVG ===')
 const bookEpub = samples.find((s) => s.name === 'imagebook')!.bytes

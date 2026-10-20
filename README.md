@@ -79,6 +79,19 @@ ukuran font; PDF **hasil pindai** diarahkan ke OCR/Image-Book. Contoh: sebuah PD
   <img src="docs/screenshots/mobile-pdf.png" alt="Konversi PDF → bab otomatis" width="300">
 </p>
 
+### Metadata & Sampul lanjutan
+
+**Metadata** dapat diedit lengkap dan ditulis ke OPF (Dublin Core): judul, penulis,
+**bahasa**, **arah baca** (LTR/RTL, berlaku ke seluruh bab), **penerbit**, **deskripsi**,
+dan **subjek/kategori**. **Sampul** memakai tombol-kartu yang jelas (Buat Otomatis / Unggah
+Gambar / Tanpa Sampul) dengan **pratinjau WYSIWYG** dan pemilih **Gaya** ber-thumbnail nyata
+(Otomatis/Klasik/Religius/Teknis). Teks judul dibungkus cerdas — kata panjang dipecah
+(hubung/paksa) dan font menyesuaikan lebar — sehingga **tidak pernah meluber/overlap**.
+
+| Metadata lanjutan | Sampul: kartu jelas + gaya ber-thumbnail |
+|:---:|:---:|
+| ![Metadata: bahasa, arah baca, penerbit, deskripsi, subjek](docs/screenshots/mobile-metadata.png) | ![Sampul: mode kartu + pratinjau + gaya](docs/screenshots/mobile-cover.png) |
+
 ## Prinsip Arsitektur
 
 - **100% client-side** — tanpa backend; seluruh proses di RAM browser.

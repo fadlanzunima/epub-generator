@@ -5,7 +5,7 @@ import { buildEpub, provideFonts } from '@epub'
 import { generateCoverBlob } from '@cover'
 import { registerCustomFont, type CustomFont } from '@fonts'
 import type { ThemeId } from '@cover'
-import type { DocumentIR, PreflightResult } from '@core/types'
+import type { DocumentIR, PreflightResult, TextDirection } from '@core/types'
 import { pushToast } from './toast'
 import { ensureNotifyPermission, notifyBuildDone } from './notify'
 
@@ -57,6 +57,12 @@ export function useConverter() {
   const [sourceName, setSourceName] = useState<string>('')
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
+  // Metadata lanjutan (dapat diedit; nilai awal dari deteksi).
+  const [language, setLanguage] = useState('id')
+  const [direction, setDirection] = useState<TextDirection>('ltr')
+  const [publisher, setPublisher] = useState('')
+  const [description, setDescription] = useState('')
+  const [subjects, setSubjects] = useState('') // dipisah koma di UI
   const [coverMode, setCoverMode] = useState<CoverMode>('auto')
   const [coverTheme, setCoverTheme] = useState<ThemeId | undefined>(undefined)
   const [customCover, setCustomCover] = useState<CustomCover | null>(null)
@@ -97,6 +103,11 @@ export function useConverter() {
         setSourceName(source)
         setTitle(parsed.meta.title)
         setAuthor(parsed.meta.author ?? '')
+        setLanguage(parsed.meta.language)
+        setDirection(parsed.meta.direction)
+        setPublisher('')
+        setDescription('')
+        setSubjects('')
         setStatus('ready')
       } catch (e) {
         let msg = (e as Error).message
@@ -213,9 +224,24 @@ export function useConverter() {
       6000,
     )
     try {
+      const subjectList = subjects
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
       const finalIr: DocumentIR = {
         ...ir,
-        meta: { ...ir.meta, title: cleanTitle, author: author.trim() || undefined },
+        meta: {
+          ...ir.meta,
+          title: cleanTitle,
+          author: author.trim() || undefined,
+          language: language.trim() || ir.meta.language,
+          direction,
+          publisher: publisher.trim() || undefined,
+          description: description.trim() || undefined,
+          subjects: subjectList.length ? subjectList : undefined,
+        },
+        // Arah baca override berlaku ke seluruh bab (dir XHTML + nav + spine).
+        chapters: ir.chapters.map((c) => ({ ...c, direction })),
       }
 
       // Sampul
@@ -276,7 +302,7 @@ export function useConverter() {
       setStatus('error')
       pushToast(`Gagal membangun EPUB: ${msg}`, 'error', 8000)
     }
-  }, [ir, title, author, coverMode, coverTheme, customCover, embedFonts, customFonts, cjkFontId, resetOutput])
+  }, [ir, title, author, language, direction, publisher, description, subjects, coverMode, coverTheme, customCover, embedFonts, customFonts, cjkFontId, resetOutput])
 
   const reset = useCallback(() => {
     resetOutput()
@@ -288,6 +314,11 @@ export function useConverter() {
     setSourceName('')
     setTitle('')
     setAuthor('')
+    setLanguage('id')
+    setDirection('ltr')
+    setPublisher('')
+    setDescription('')
+    setSubjects('')
     setCoverMode('auto')
     setCoverTheme(undefined)
     setCustomFonts([])
@@ -304,6 +335,11 @@ export function useConverter() {
     sourceName,
     title,
     author,
+    language,
+    direction,
+    publisher,
+    description,
+    subjects,
     coverMode,
     coverTheme,
     customCover,
@@ -317,6 +353,11 @@ export function useConverter() {
     buildNotices,
     setTitle,
     setAuthor,
+    setLanguage,
+    setDirection,
+    setPublisher,
+    setDescription,
+    setSubjects,
     setCoverMode,
     setCoverTheme,
     setCustomCoverFile,

@@ -18,7 +18,7 @@ import { useOnline } from './useOnline'
 import { Toasts } from './Toasts'
 import { pushToast } from './toast'
 import { CJK_FONT_CHOICES } from '@fonts'
-import type { ScriptHint, TextDirection } from '@core/types'
+import type { ScriptHint } from '@core/types'
 
 const SCRIPT_LABEL: Record<ScriptHint, string> = {
   latin: 'Latin',
@@ -30,9 +30,23 @@ const SCRIPT_LABEL: Record<ScriptHint, string> = {
   unknown: 'Tak dikenal',
 }
 
-function dirLabel(dir: TextDirection): string {
-  return dir === 'rtl' ? 'Kanan→Kiri (RTL)' : 'Kiri→Kanan (LTR)'
-}
+/** Pilihan bahasa umum (BCP-47) untuk <dc:language>. */
+const LANGS: { code: string; label: string }[] = [
+  { code: 'id', label: 'Indonesia' },
+  { code: 'en', label: 'Inggris' },
+  { code: 'ar', label: 'Arab' },
+  { code: 'ms', label: 'Melayu' },
+  { code: 'jv', label: 'Jawa' },
+  { code: 'su', label: 'Sunda' },
+  { code: 'zh', label: 'Mandarin' },
+  { code: 'ja', label: 'Jepang' },
+  { code: 'ko', label: 'Korea' },
+  { code: 'ru', label: 'Rusia' },
+  { code: 'es', label: 'Spanyol' },
+  { code: 'fr', label: 'Prancis' },
+  { code: 'de', label: 'Jerman' },
+  { code: 'nl', label: 'Belanda' },
+]
 
 export function ConverterApp() {
   const c = useConverter()
@@ -134,13 +148,67 @@ export function ConverterApp() {
                 <div className="flex flex-col gap-4">
                   <Field id="title" label="Judul" value={c.title} onChange={c.setTitle} placeholder="Judul buku" />
                   <Field id="author" label="Penulis" value={c.author} onChange={c.setAuthor} placeholder="(opsional)" />
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge>Bahasa: {c.ir.meta.language}</Badge>
-                    <Badge>Skrip: {SCRIPT_LABEL[c.ir.meta.script]}</Badge>
-                    <Badge>{dirLabel(c.ir.meta.direction)}</Badge>
-                    <Badge>{c.ir.chapters.length} bab</Badge>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label htmlFor="lang" className="flex flex-col gap-1.5">
+                      <span className="font-ui text-body text-ink-muted">Bahasa</span>
+                      <select
+                        id="lang"
+                        value={c.language}
+                        onChange={(e) => c.setLanguage(e.target.value)}
+                        className="min-h-tap border-eink border-black bg-white px-3 font-ui text-body-lg text-ink focus-visible:outline-none focus-visible:border-dashed"
+                      >
+                        {!LANGS.some((l) => l.code === c.language) && (
+                          <option value={c.language}>{c.language}</option>
+                        )}
+                        {LANGS.map((l) => (
+                          <option key={l.code} value={l.code}>
+                            {l.label} ({l.code})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <div className="flex flex-col gap-1.5">
+                      <span className="font-ui text-body text-ink-muted">Arah baca</span>
+                      <div className="flex gap-2">
+                        <SegmentedOption active={c.direction === 'ltr'} onClick={() => c.setDirection('ltr')}>
+                          Kiri→Kanan
+                        </SegmentedOption>
+                        <SegmentedOption active={c.direction === 'rtl'} onClick={() => c.setDirection('rtl')}>
+                          Kanan→Kiri
+                        </SegmentedOption>
+                      </div>
+                    </div>
                   </div>
-                  <p className="font-ui text-body text-ink-faint">Sumber: {c.sourceName}</p>
+
+                  <Field id="publisher" label="Penerbit" value={c.publisher} onChange={c.setPublisher} placeholder="(opsional)" />
+
+                  <label htmlFor="desc" className="flex flex-col gap-1.5">
+                    <span className="font-ui text-body text-ink-muted">Deskripsi / Sinopsis</span>
+                    <textarea
+                      id="desc"
+                      value={c.description}
+                      rows={3}
+                      placeholder="(opsional) ringkasan singkat isi buku"
+                      onChange={(e) => c.setDescription(e.target.value)}
+                      className="border-eink border-black bg-white p-3 font-ui text-body text-ink placeholder:text-ink-faint focus-visible:outline-none focus-visible:border-dashed"
+                    />
+                  </label>
+
+                  <Field
+                    id="subjects"
+                    label="Subjek / Kategori (pisahkan dengan koma)"
+                    value={c.subjects}
+                    onChange={c.setSubjects}
+                    placeholder="mis. novel, sejarah, Indonesia"
+                  />
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge>Skrip: {SCRIPT_LABEL[c.ir.meta.script]}</Badge>
+                    <Badge>{c.ir.chapters.length} bab</Badge>
+                    <Badge>Sumber: {c.sourceName}</Badge>
+                  </div>
                 </div>
               </Section>
 

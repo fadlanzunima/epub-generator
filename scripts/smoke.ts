@@ -295,6 +295,12 @@ const shortFit = fitFontSize('Doa', { maxWidth: 1280, maxHeight: 1280, maxFont: 
 const longFit = fitFontSize('Ensiklopedia Lengkap Sejarah Peradaban Dunia Kuno Dan Modern', { maxWidth: 1280, maxHeight: 1280, maxFont: 180, minFont: 48, lineHeightRatio: 1.2, maxLines: 6 }, measure)
 check('judul pendek -> font lebih besar dari judul panjang', shortFit.fontSize > longFit.fontSize, { short: shortFit.fontSize, long: longFit.fontSize })
 check('judul panjang -> multi-baris', longFit.lines.length > 1)
+// Kata panjang (hubung/tanpa spasi) harus dipecah agar tak meluber (anti-overlap).
+const longWord = wrapText('Undang-UndangDasarNegaraRepublikIndonesia', 300, 40, measure)
+check('kata panjang dipecah: tiap baris <= maxWidth', longWord.every((l) => measure(l, 40) <= 300))
+const tightFit = fitFontSize('Pembukaan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945 Yang Sangat Panjang', { maxWidth: 300, maxHeight: 400, maxFont: 180, minFont: 48, lineHeightRatio: 1.2, maxLines: 6 }, measure)
+check('fit: tiap baris muat (tanpa overlap horizontal)', tightFit.lines.every((l) => measure(l, tightFit.fontSize) <= 300))
+check('fit: baris dibatasi maxLines (elipsis bila perlu)', tightFit.lines.length <= 6)
 
 console.log('\n[19] Image pipeline (Grayscale High-Contrast) + Image-Book')
 const px = new Uint8ClampedArray([200, 100, 50, 255, 10, 20, 30, 128])

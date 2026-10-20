@@ -66,6 +66,10 @@ Teks sub.
 `),
     { baseName: 'panduan' },
   )
+  // Metadata lanjutan (dc:publisher/description/subject) untuk uji OPF.
+  latinIR.meta.publisher = 'Penerbit Uji'
+  latinIR.meta.description = 'Deskripsi ringkas panduan E-Ink untuk pengujian metadata.'
+  latinIR.meta.subjects = ['panduan', 'e-ink', 'uji']
   const latinFont = embedAsset(h, primaryFont('latin')!, collectUsedChars(latinIR))
   const latinFontBytes = latinFont.binaries.reduce((s, b) => s + b.data.byteLength, 0)
   const latin = (await buildEpub(latinIR, {

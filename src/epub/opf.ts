@@ -74,6 +74,18 @@ export function buildContentOpf(p: OpfParams): string {
   const creator = meta.author
     ? `    <dc:creator id="creator">${esc(meta.author)}</dc:creator>\n`
     : ''
+  const publisher = meta.publisher?.trim()
+    ? `    <dc:publisher>${esc(meta.publisher.trim())}</dc:publisher>\n`
+    : ''
+  const description = meta.description?.trim()
+    ? `    <dc:description>${esc(meta.description.trim())}</dc:description>\n`
+    : ''
+  const subjects = (meta.subjects ?? [])
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => `    <dc:subject>${esc(s)}</dc:subject>`)
+    .join('\n')
+  const subjectBlock = subjects ? subjects + '\n' : ''
   const coverMeta = p.coverImageHref ? '    <meta name="cover" content="cover-image"/>\n' : ''
 
   return [
@@ -86,6 +98,9 @@ export function buildContentOpf(p: OpfParams): string {
     `    <dc:title>${esc(meta.title)}</dc:title>`,
     `    <dc:language>${esc(meta.language)}</dc:language>`,
     creator +
+      publisher +
+      description +
+      subjectBlock +
       `    <meta property="dcterms:modified">${esc(p.modified)}</meta>` +
       (coverMeta ? '\n' + coverMeta.trimEnd() : ''),
     '  </metadata>',
