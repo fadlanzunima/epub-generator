@@ -58,7 +58,7 @@ berkas `.epub` siap unduh:
 
 | Pratinjau file ter-generate — tab Bigme (Android E-Ink) | Berkas `.epub` siap diunduh/transfer |
 |:---:|:---:|
-| ![Juz Amma RTL pada simulator Bigme](docs/screenshots/mobile-android-arab.png) | ![EPUB 96.7 KB siap unduh](docs/screenshots/mobile-result.png) |
+| ![Juz Amma (An-Naba 78) RTL pada simulator Bigme](docs/screenshots/mobile-android-arab.png) | ![EPUB ±108 KB siap unduh/transfer](docs/screenshots/mobile-result.png) |
 
 ### Notifikasi & build latar belakang
 
