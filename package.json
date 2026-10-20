@@ -11,7 +11,8 @@
     "typecheck": "tsc -b --noEmit",
     "smoke": "tsx --tsconfig tsconfig.app.json scripts/smoke.ts",
     "validate": "tsx --tsconfig tsconfig.app.json scripts/validate.ts",
-    "epubcheck": "tsx --tsconfig tsconfig.app.json scripts/epubcheck.ts"
+    "epubcheck": "tsx --tsconfig tsconfig.app.json scripts/epubcheck.ts",
+    "telegram:setup": "node scripts/telegram-setup.mjs"
   },
   "dependencies": {
     "@mozilla/readability": "^0.5.0",
