@@ -18,16 +18,19 @@ Onyx Boox, Meebook), dengan dukungan penuh skrip **Arab/Qur'an (RTL + font embed
 
 ## Tampilan
 
-Alur konversi lengkap — unggah dokumen, periksa metadata & bab, pratinjau WYSIWYG di
-**Live Simulator** (Kindle/Kobo/Onyx), pilih sampul, lalu bangun EPUB — semua di perangkat:
+Antarmuka **E-Ink serif** dengan **Dual-Pane** di tablet/PC — editor di kiri, **Live Simulator**
+(Kindle/Kobo/Onyx, mode **Gulir** atau **Halaman**/page-flip) menempel di kanan:
 
 <p align="center">
-  <img src="docs/screenshots/03-convert.png" alt="Alur konversi EPUB Builder" width="430">
+  <img src="docs/screenshots/06-dualpane.png" alt="Dual-Pane: editor + Live Simulator" width="820">
 </p>
 
-| Onboarding | Live Simulator | Panel Masukan |
+Di ponsel/eReader tampil satu kolom. Masukan lewat **Berkas / URL / OCR / Gambar (Buku)**, atau
+**Pustaka Siap-Pakai** (Juz Amma via quran.com API, UUD 1945 offline):
+
+| Onboarding | Masukan + Pustaka Siap-Pakai | Live Simulator (page-flip) |
 |:---:|:---:|:---:|
-| ![Onboarding walkthrough](docs/screenshots/01-onboarding.png) | ![Live Simulator E-Ink](docs/screenshots/04-simulator.png) | ![Panel masukan: Berkas / URL / OCR](docs/screenshots/02-input.png) |
+| ![Onboarding walkthrough](docs/screenshots/01-onboarding.png) | ![Panel masukan & Pustaka Siap-Pakai](docs/screenshots/02-input.png) | ![Live Simulator mode Halaman](docs/screenshots/04-simulator.png) |
 
 ## Prinsip Arsitektur
 
