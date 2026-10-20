@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs'
 import { buildEpub, type EmbeddedFont } from '@epub'
 import { assembleIR, parseMarkdown } from '@parsers'
 import { primaryFont, subsetWithHb, collectUsedChars, type HbSubsetExports } from '@fonts'
+import type { DocumentIR } from '@core/types'
 
 export interface Sample {
   /** id pendek untuk nama berkas. */
@@ -91,8 +92,25 @@ Teks sub.
     fonts: [arFont],
   })) as Uint8Array
 
+  // Image-Book + Inline SVG: aset gambar lokal (manifest + file) & bab berisi
+  // ligatur Bismillah ﷽ yang dibungkus SVG inline (manifest properties="svg").
+  const imgBytes = new Uint8Array(readFileSync('public/pwa-512.png'))
+  const bookIR: DocumentIR = {
+    meta: { title: 'Buku Gambar + Kaligrafi', language: 'ar', direction: 'rtl', script: 'arabic', source: 'image-book' },
+    chapters: [
+      { id: 'page-1', title: 'Halaman 1', direction: 'ltr', blocks: [{ kind: 'image', src: 'images/p1.png', alt: 'halaman 1' }] },
+      { id: 'basmalah', title: 'Basmalah', direction: 'rtl', blocks: [{ kind: 'paragraph', text: '﷽' }] },
+    ],
+    assets: [{ path: 'images/p1.png', mime: 'image/png', data: imgBytes as unknown as Blob }],
+  }
+  const book = (await buildEpub(bookIR, {
+    identifier: 'urn:uuid:0a0b0c0d-1111-2222-3333-444455556666',
+    modified: '2026-10-20T00:00:00Z',
+  })) as Uint8Array
+
   return [
     { name: 'latin', bytes: latin, label: `EPUB Latin (+cover, Literata subset ${latinFontBytes} B, tabel, sub-bab) — ${latin.byteLength} B` },
     { name: 'arab', bytes: arab, label: `EPUB Arab (RTL + LPMQ subset ${arFont.binaries[0].data.byteLength} B) — ${arab.byteLength} B` },
+    { name: 'imagebook', bytes: book, label: `EPUB Image-Book (gambar embed + SVG kaligrafi) — ${book.byteLength} B` },
   ]
 }

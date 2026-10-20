@@ -16,6 +16,12 @@ export interface FontAsset {
   scripts: ScriptHint[]
   /** true: boleh di-embed ke EPUB (lisensi open-source). */
   embeddable: boolean
+  /**
+   * URL CDN untuk font yang TIDAK dibundel lokal (mis. CJK yang besar). Bila
+   * biner lokal tak ada & opsi remote diizinkan, provideFonts mengunduhnya di
+   * sini lalu men-subset (hasil embed tetap kecil). Harus ber-CORS.
+   */
+  remoteUrl?: string
   source: { license: string; url: string }
 }
 
@@ -95,15 +101,47 @@ export const FONT_REGISTRY: FontAsset[] = [
     embeddable: true,
     source: { license: OFL, url: 'https://github.com/notofonts/sundanese' },
   },
+  // Font CJK TIDAK dibundel (9–18 MB — bertentangan dengan build ringan), tapi
+  // bisa di-embed ON-DEMAND: diunduh dari CDN (remoteUrl) saat build lalu
+  // di-subset sehingga hasil embed kecil. Dipilih pengguna per-region karena
+  // deteksi otomatis melebur Mandarin/Jepang/Korea menjadi satu skrip 'cjk'.
   {
-    id: 'noto-sans-cjk',
-    family: 'Noto Sans CJK',
-    files: [{ style: 'normal', weight: 400, file: 'NotoSansCJKsc-Regular.otf' }],
-    format: 'opentype',
+    id: 'noto-sans-sc',
+    family: 'Noto Sans SC',
+    files: [{ style: 'normal', weight: 400, file: 'NotoSansSC-Regular.ttf' }],
+    format: 'truetype',
     scripts: ['cjk'],
     embeddable: true,
-    source: { license: OFL, url: 'https://github.com/notofonts/noto-cjk' },
+    remoteUrl: 'https://raw.githubusercontent.com/google/fonts/main/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf',
+    source: { license: OFL, url: 'https://fonts.google.com/noto/specimen/Noto+Sans+SC' },
   },
+  {
+    id: 'noto-sans-jp',
+    family: 'Noto Sans JP',
+    files: [{ style: 'normal', weight: 400, file: 'NotoSansJP-Regular.ttf' }],
+    format: 'truetype',
+    scripts: ['cjk'],
+    embeddable: true,
+    remoteUrl: 'https://raw.githubusercontent.com/google/fonts/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf',
+    source: { license: OFL, url: 'https://fonts.google.com/noto/specimen/Noto+Sans+JP' },
+  },
+  {
+    id: 'noto-sans-kr',
+    family: 'Noto Sans KR',
+    files: [{ style: 'normal', weight: 400, file: 'NotoSansKR-Regular.ttf' }],
+    format: 'truetype',
+    scripts: ['cjk'],
+    embeddable: true,
+    remoteUrl: 'https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/NotoSansKR%5Bwght%5D.ttf',
+    source: { license: OFL, url: 'https://fonts.google.com/noto/specimen/Noto+Sans+KR' },
+  },
+]
+
+/** Pilihan font CJK on-demand untuk UI (id + label region). */
+export const CJK_FONT_CHOICES: { id: string; label: string; approxMb: number }[] = [
+  { id: 'noto-sans-sc', label: 'Mandarin (SC)', approxMb: 18 },
+  { id: 'noto-sans-jp', label: 'Jepang (JP)', approxMb: 10 },
+  { id: 'noto-sans-kr', label: 'Korea (KR)', approxMb: 10 },
 ]
 
 /** Font konten utama (untuk di-embed) yang cocok untuk sebuah skrip. */

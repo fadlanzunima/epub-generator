@@ -60,6 +60,17 @@ export default defineConfig({
               cacheableResponse: { statuses: [0, 200] },
             },
           },
+          {
+            // Font CJK on-demand diunduh dari CDN google/fonts (raw.githubusercontent).
+            // Cache setelah unduh pertama agar embed CJK tetap bisa offline.
+            urlPattern: ({ url }) => url.hostname === 'raw.githubusercontent.com',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'epub-remote-fonts',
+              expiration: { maxEntries: 6, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
       },
       devOptions: { enabled: false },
@@ -75,6 +86,7 @@ export default defineConfig({
       '@cover': fileURLToPath(new URL('./src/cover', import.meta.url)),
       '@ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
       '@pwa': fileURLToPath(new URL('./src/pwa', import.meta.url)),
+      '@presets': fileURLToPath(new URL('./src/presets', import.meta.url)),
     },
   },
 })

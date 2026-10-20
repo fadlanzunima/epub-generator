@@ -5,9 +5,9 @@
  */
 import { useState } from 'react'
 import { Dropzone } from './Dropzone'
-import { SegmentedOption } from './primitives'
+import { Alert, SegmentedOption } from './primitives'
 
-type Tab = 'file' | 'url' | 'ocr'
+type Tab = 'file' | 'url' | 'ocr' | 'imagebook'
 
 const OCR_LANGS: { value: string; label: string }[] = [
   { value: 'ind+eng', label: 'Indonesia + Inggris' },
@@ -18,18 +18,22 @@ const OCR_LANGS: { value: string; label: string }[] = [
 
 export function InputPanel({
   busy,
+  online,
   ocrProgress,
   onFile,
   onUrl,
   onHtml,
   onImage,
+  onImages,
 }: {
   busy: boolean
+  online: boolean
   ocrProgress: number | null
   onFile: (file: File) => void
   onUrl: (url: string) => void
   onHtml: (html: string) => void
   onImage: (file: File, lang: string) => void
+  onImages: (files: File[]) => void
 }) {
   const [tab, setTab] = useState<Tab>('file')
   const [url, setUrl] = useState('')
@@ -48,12 +52,21 @@ export function InputPanel({
         <SegmentedOption active={tab === 'ocr'} onClick={() => setTab('ocr')} disabled={busy}>
           Gambar (OCR)
         </SegmentedOption>
+        <SegmentedOption active={tab === 'imagebook'} onClick={() => setTab('imagebook')} disabled={busy}>
+          Gambar (Buku)
+        </SegmentedOption>
       </div>
 
       {tab === 'file' && <Dropzone onFile={onFile} busy={busy} />}
 
       {tab === 'url' && (
         <div className="flex flex-col gap-4 border-eink border-black bg-white p-5">
+          {!online && (
+            <Alert tone="warning">
+              Sedang offline — mengambil artikel dari URL butuh koneksi. Anda masih bisa menempel
+              HTML/teks artikel di bawah untuk diproses secara lokal.
+            </Alert>
+          )}
           <label className="flex flex-col gap-1.5">
             <span className="font-ui text-body text-ink-muted">Alamat artikel (URL)</span>
             <div className="flex gap-2">
@@ -68,7 +81,7 @@ export function InputPanel({
               <button
                 type="button"
                 className="btn-eink btn-eink--inverted px-4"
-                disabled={busy || !url.trim()}
+                disabled={busy || !url.trim() || !online}
                 onClick={() => onUrl(url.trim())}
               >
                 Ekstrak
@@ -140,6 +153,40 @@ export function InputPanel({
           )}
           <p className="font-ui text-body text-ink-faint">
             Catatan: OCR mengunduh data latih bahasa saat pertama dipakai (sekali, lalu di-cache).
+          </p>
+          {!online && (
+            <Alert tone="warning">
+              Sedang offline — jika data latih bahasa ini belum pernah diunduh, OCR akan gagal.
+              Bahasa yang sudah pernah dipakai tetap bisa dijalankan offline.
+            </Alert>
+          )}
+        </div>
+      )}
+
+      {tab === 'imagebook' && (
+        <div className="flex flex-col gap-4 border-eink border-black bg-white p-5">
+          <p className="font-ui text-body text-ink-muted">
+            Satu gambar = satu halaman (komik, infografis, atau hasil pindai). Semua gambar
+            otomatis dikonversi ke <strong>Grayscale High-Contrast</strong> ramah E-Ink.
+          </p>
+          <label className="btn-eink btn-eink--inverted cursor-pointer">
+            Pilih Gambar (bisa banyak)
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              disabled={busy}
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? [])
+                if (files.length) onImages(files)
+                e.target.value = ''
+              }}
+            />
+          </label>
+          <p className="font-ui text-body text-ink-faint">
+            Urutan halaman mengikuti urutan nama berkas. Teks di dalam gambar tidak dapat dicari
+            (gunakan tab <strong>Gambar (OCR)</strong> bila ingin teks yang bisa diseleksi).
           </p>
         </div>
       )}

@@ -6,10 +6,15 @@ Aplikasi **PWA 100% client-side, Non-AI, gratis** untuk mengubah dokumen
 Onyx Boox, Meebook), dengan dukungan penuh skrip **Arab/Qur'an (RTL + font embed)**.
 
 > Status: **Lengkap & tervalidasi.** Mesin konversi (parsers · fonts · epub · cover),
-> antarmuka E-Ink (Unggah → Metadata → Sampul → Build → Transfer), Live Simulator +
-> Immersion Mode + onboarding, parser URL (Readability) & OCR (Tesseract), subsetting
-> font HarfBuzz, dan PWA (offline · install · Web Share · QR) — semua 100% client-side.
-> EPUB hasil **lulus epubcheck resmi IDPF/W3C (0 error)**.
+> antarmuka E-Ink (Unggah → Metadata → Sampul → Build → Transfer) dengan **Dual-Pane**
+> di tablet/PC, Live Simulator (**mode Gulir & Halaman/page-flip**) + Immersion Mode +
+> onboarding, parser URL (Readability), OCR (Tesseract) & **Image-Book Mode** (buku
+> berbasis gambar grayscale), **Custom Font Upload** (.ttf/.otf) & **font CJK
+> on-demand** (Noto SC/JP/KR, unduh+subset saat build), **Inline SVG** untuk
+> ligatur kaligrafi, **Pustaka siap-pakai** (Juz Amma via quran.com API, UUD 1945
+> offline), **Kirim ke Kindle**, subsetting font HarfBuzz, dan PWA (offline · install ·
+> Web Share · QR) — semua 100% client-side. EPUB hasil **lulus epubcheck resmi
+> IDPF/W3C (0 error)**, termasuk EPUB Image-Book + SVG.
 
 ## Tampilan
 
@@ -70,5 +75,6 @@ npm run epubcheck  # validasi OTORITATIF via epubcheck resmi IDPF/W3C (butuh Jav
 | `fonts/` | font builder RTL, subsetting, language detector | 2 |
 | `epub/` | perakit JSZip, OPF/NAV/NCX, splitter, image pipeline | 3 |
 | `cover/` | Canvas cover generator adaptif | 3 |
-| `ui/` | komponen E-Ink, simulator, immersion, onboarding | 4 & 5 |
-| `pwa/` | service worker, QR transfer | 6 |
+| `ui/` | komponen E-Ink, simulator (gulir/halaman), immersion, onboarding, dual-pane | 4 & 5 |
+| `pwa/` | service worker, QR transfer, Send-to-Kindle | 6 |
+| `presets/` | Pustaka siap-pakai: quran.com API (Juz Amma), UUD 1945 offline | — |

@@ -45,6 +45,18 @@ export async function buildEpub(ir: DocumentIR, opts: BuildEpubOptions): Promise
     chapter,
   }))
 
+  // Render bab lebih dulu agar bisa mendeteksi SVG inline (menentukan
+  // properties="svg" di manifest — wajib menurut epubcheck).
+  const rendered = chapterFiles.map((cf) => {
+    const xhtml = renderChapterXhtml(cf.chapter, {
+      chapterId: cf.chapter.id,
+      lang: ir.meta.language,
+      cssHref: '../styles/content.css',
+    })
+    if (xhtml.includes('<svg')) cf.properties = cf.properties ? `${cf.properties} svg` : 'svg'
+    return { href: cf.href, xhtml }
+  })
+
   const css = buildContentCss(
     { script: ir.meta.script, direction: ir.meta.direction },
     fonts.map((f) => f.asset),
@@ -62,6 +74,10 @@ export async function buildEpub(ir: DocumentIR, opts: BuildEpubOptions): Promise
     coverImageMime = opts.cover.mime
   }
 
+  // Aset biner lokal (gambar Image-Book, dll.) — masuk manifest & ditulis ke ZIP.
+  const assets = ir.assets ?? []
+  const assetItems = assets.map((a, i) => ({ id: `asset-${i + 1}`, href: a.path, mime: a.mime }))
+
   const opf = buildContentOpf({
     identifier: opts.identifier,
     modified: opts.modified,
@@ -71,6 +87,7 @@ export async function buildEpub(ir: DocumentIR, opts: BuildEpubOptions): Promise
     hasCss: Boolean(css),
     coverImageHref,
     coverImageMime,
+    assets: assetItems,
   })
   const nav = buildNavXhtml({ lang: ir.meta.language, dir: ir.meta.direction, title: ir.meta.title, entries: navNodes })
   const ncx = buildNcx({ identifier: opts.identifier, title: ir.meta.title, entries: navNodes })
@@ -87,15 +104,8 @@ export async function buildEpub(ir: DocumentIR, opts: BuildEpubOptions): Promise
   oebps.file('toc.ncx', ncx)
   if (css) oebps.file('styles/content.css', css)
 
-  for (const cf of chapterFiles) {
-    oebps.file(
-      cf.href,
-      renderChapterXhtml(cf.chapter, {
-        chapterId: cf.chapter.id,
-        lang: ir.meta.language,
-        cssHref: '../styles/content.css',
-      }),
-    )
+  for (const r of rendered) {
+    oebps.file(r.href, r.xhtml)
   }
 
   for (const font of fonts) {
@@ -106,6 +116,10 @@ export async function buildEpub(ir: DocumentIR, opts: BuildEpubOptions): Promise
 
   if (opts.cover && coverImageHref) {
     oebps.file(coverImageHref, opts.cover.data)
+  }
+
+  for (const asset of assets) {
+    oebps.file(asset.path, asset.data)
   }
 
   return zip.generateAsync({

@@ -1,6 +1,7 @@
 import type { Chapter, ContentBlock } from '@core/types'
 import { subHeadingId } from '@core/ids'
 import { XML_DECL, esc, escAttr } from './xml'
+import { wrapComplexGlyphs } from './svgGlyph'
 
 export interface RenderOptions {
   chapterId: string
@@ -16,7 +17,7 @@ export interface RenderOptions {
  */
 export function renderChapterXhtml(chapter: Chapter, opts: RenderOptions): string {
   const body: string[] = []
-  body.push(`<h1>${esc(chapter.title)}</h1>`)
+  body.push(`<h1>${wrapComplexGlyphs(esc(chapter.title))}</h1>`)
 
   let h3Ordinal = 0
   for (const b of chapter.blocks) {
@@ -41,26 +42,37 @@ export function renderChapterXhtml(chapter: Chapter, opts: RenderOptions): strin
   ].join('\n')
 }
 
+/**
+ * Resolusi href gambar relatif terhadap berkas bab (yang berada di `text/`).
+ * Aset lokal disimpan sebagai path relatif-OEBPS (mis. `images/p1.jpg`) agar
+ * konsisten dengan manifest OPF & pre-flight; dari dalam `text/chap-N.xhtml`
+ * path itu perlu prefix `../`. Data URI / URL absolut dibiarkan apa adanya.
+ */
+function resolveImageHref(src: string): string {
+  if (/^(data:|https?:|\/|\.\.?\/)/.test(src)) return src
+  return `../${src}`
+}
+
 function renderBlock(b: ContentBlock, chapterId: string, nextH3: () => number): string {
   switch (b.kind) {
     case 'heading': {
       if (b.level === 3) {
         const id = subHeadingId(chapterId, b.text, nextH3())
-        return `<h3 id="${escAttr(id)}">${esc(b.text)}</h3>`
+        return `<h3 id="${escAttr(id)}">${wrapComplexGlyphs(esc(b.text))}</h3>`
       }
       // level 1/2 di dalam bab -> h2 (h1 dipakai judul bab)
-      return `<h2>${esc(b.text)}</h2>`
+      return `<h2>${wrapComplexGlyphs(esc(b.text))}</h2>`
     }
     case 'paragraph':
       // html sudah dibersihkan ke inline aman (strong/em/a/br) & well-formed.
-      return `<p>${b.html ?? esc(b.text)}</p>`
+      return `<p>${wrapComplexGlyphs(b.html ?? esc(b.text))}</p>`
     case 'list': {
       const tag = b.ordered ? 'ol' : 'ul'
       const items = b.items.map((it) => `    <li>${esc(it)}</li>`).join('\n')
       return `<${tag}>\n${items}\n  </${tag}>`
     }
     case 'image':
-      return `<p><img src="${escAttr(b.src)}" alt="${escAttr(b.alt ?? '')}"/></p>`
+      return `<p><img src="${escAttr(resolveImageHref(b.src))}" alt="${escAttr(b.alt ?? '')}"/></p>`
     case 'table':
       return renderTable(b)
     case 'html':

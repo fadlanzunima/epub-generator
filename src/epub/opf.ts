@@ -16,6 +16,8 @@ export interface OpfParams {
   /** href gambar sampul di dalam EPUB (Fase 3B). */
   coverImageHref?: string
   coverImageMime?: string
+  /** Aset biner lokal tambahan (gambar Image-Book) untuk manifest. */
+  assets?: { id: string; href: string; mime: string }[]
 }
 
 /**
@@ -43,10 +45,18 @@ export function buildContentOpf(p: OpfParams): string {
     )
   }
 
+  // Aset gambar lokal (Image-Book / gambar embed)
+  for (const a of p.assets ?? []) {
+    manifest.push(
+      `    <item id="${escAttr(a.id)}" href="${escAttr(a.href)}" media-type="${escAttr(a.mime)}"/>`,
+    )
+  }
+
   // Bab
   for (const cf of p.chapterFiles) {
+    const props = cf.properties ? ` properties="${escAttr(cf.properties)}"` : ''
     manifest.push(
-      `    <item id="${escAttr(cf.id)}" href="${escAttr(cf.href)}" media-type="application/xhtml+xml"/>`,
+      `    <item id="${escAttr(cf.id)}" href="${escAttr(cf.href)}" media-type="application/xhtml+xml"${props}/>`,
     )
     spine.push(`    <itemref idref="${escAttr(cf.id)}"/>`)
   }

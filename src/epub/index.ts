@@ -9,6 +9,7 @@ export { grayscaleHighContrast, processImageToGrayscaleBlob } from './image'
 export type { GrayscaleOptions } from './image'
 export { buildImageBookIR } from './imageBook'
 export type { ImagePage, ImageBookMeta } from './imageBook'
+export { containsComplexGlyph, wrapComplexGlyphs } from './svgGlyph'
 export type {
   BuildEpubOptions,
   EmbeddedFont,

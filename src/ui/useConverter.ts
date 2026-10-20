@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
-import { parseFile, parseUrl, parseHtmlArticle, parseImageOcr } from '@parsers'
+import { parseFile, parseUrl, parseHtmlArticle, parseImageOcr, parseImagesToBook } from '@parsers'
 import { preflight } from '@core'
 import { buildEpub, provideFonts } from '@epub'
 import { generateCoverBlob } from '@cover'
+import { registerCustomFont, type CustomFont } from '@fonts'
 import type { ThemeId } from '@cover'
 import type { DocumentIR, PreflightResult } from '@core/types'
 
@@ -58,9 +59,14 @@ export function useConverter() {
   const [coverTheme, setCoverTheme] = useState<ThemeId | undefined>(undefined)
   const [customCover, setCustomCover] = useState<CustomCover | null>(null)
   const [embedFonts, setEmbedFonts] = useState(true)
+  const [customFonts, setCustomFonts] = useState<CustomFont[]>([])
+  // Font CJK on-demand (id region) — null: tidak embed (fallback font eReader).
+  const [cjkFontId, setCjkFontId] = useState<string | null>(null)
   const [result, setResult] = useState<BuildResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [ocrProgress, setOcrProgress] = useState<number | null>(null)
+  // Pemberitahuan non-fatal hasil build (mis. font CJK gagal diunduh → fallback).
+  const [buildNotices, setBuildNotices] = useState<string[]>([])
 
   const preflightResult: PreflightResult | null = useMemo(() => {
     if (!ir) return null
@@ -91,7 +97,13 @@ export function useConverter() {
         setAuthor(parsed.meta.author ?? '')
         setStatus('ready')
       } catch (e) {
-        setError((e as Error).message)
+        let msg = (e as Error).message
+        // Beri tahu bila kegagalan kemungkinan karena offline (fitur online:
+        // Pustaka quran.com, fetch URL, data latih OCR).
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          msg = `Anda sedang offline — fitur ini butuh koneksi internet. (${msg})`
+        }
+        setError(msg)
         setStatus('error')
       }
     },
@@ -99,6 +111,12 @@ export function useConverter() {
   )
 
   const loadFile = useCallback((file: File) => runParse(() => parseFile(file), file.name), [runParse])
+
+  /** Muat preset Pustaka (repo publik / bawaan) -> DocumentIR. */
+  const loadPreset = useCallback(
+    (produce: () => Promise<DocumentIR>, label: string) => runParse(produce, label),
+    [runParse],
+  )
 
   const loadUrl = useCallback((url: string) => runParse(() => parseUrl(url), url), [runParse])
 
@@ -115,6 +133,28 @@ export function useConverter() {
       ),
     [runParse],
   )
+
+  /** Image-Book Mode: banyak gambar -> EPUB berbasis halaman gambar grayscale. */
+  const loadImages = useCallback(
+    (files: File[]) =>
+      runParse(() => parseImagesToBook(files), `Buku gambar: ${files.length} halaman`),
+    [runParse],
+  )
+
+  /** Tambah font kustom (.ttf/.otf) untuk di-embed. */
+  const addCustomFont = useCallback(async (file: File) => {
+    const font = await registerCustomFont(file)
+    setCustomFonts((prev) => {
+      // Ganti bila family sama agar tidak dobel.
+      const rest = prev.filter((f) => f.asset.id !== font.asset.id)
+      return [...rest, font]
+    })
+    return font
+  }, [])
+
+  const removeCustomFont = useCallback((id: string) => {
+    setCustomFonts((prev) => prev.filter((f) => f.asset.id !== id))
+  }, [])
 
   const setCustomCoverFile = useCallback(async (file: File) => {
     const data = await file.arrayBuffer()
@@ -142,6 +182,7 @@ export function useConverter() {
 
     setStatus('building')
     setError(null)
+    setBuildNotices([])
     resetOutput()
     try {
       const finalIr: DocumentIR = {
@@ -162,8 +203,27 @@ export function useConverter() {
         cover = { data: customCover.data, mime: customCover.mime }
       }
 
-      // Font embed (di-skip graceful bila biner belum dibundel)
-      const fonts = embedFonts ? await provideFonts(finalIr) : []
+      // Font embed (di-skip graceful bila biner belum dibundel). Font kustom
+      // unggahan pengguna & CJK on-demand tetap disertakan bila dipilih
+      // (meski embed otomatis off). CJK selalu di-subset (font besar).
+      const wantCjk = finalIr.meta.script === 'cjk' && !!cjkFontId
+      const fonts =
+        embedFonts || customFonts.length > 0 || wantCjk
+          ? await provideFonts(finalIr, {
+              custom: customFonts,
+              subset: embedFonts || wantCjk,
+              cjkFontId,
+            })
+          : []
+
+      // Pemberitahuan in-app bila kondisi "jujur" terjadi saat build.
+      const notices: string[] = []
+      if (wantCjk && !fonts.some((f) => f.asset.id === cjkFontId)) {
+        notices.push(
+          'Font CJK gagal diunduh (kemungkinan offline atau CDN diblokir) — EPUB memakai font CJK bawaan eReader.',
+        )
+      }
+      setBuildNotices(notices)
 
       const blob = (await buildEpub(finalIr, {
         identifier: `urn:uuid:${crypto.randomUUID()}`,
@@ -181,7 +241,7 @@ export function useConverter() {
       setError((e as Error).message)
       setStatus('error')
     }
-  }, [ir, title, author, coverMode, coverTheme, customCover, embedFonts, resetOutput])
+  }, [ir, title, author, coverMode, coverTheme, customCover, embedFonts, customFonts, cjkFontId, resetOutput])
 
   const reset = useCallback(() => {
     resetOutput()
@@ -195,7 +255,10 @@ export function useConverter() {
     setAuthor('')
     setCoverMode('auto')
     setCoverTheme(undefined)
+    setCustomFonts([])
+    setCjkFontId(null)
     setError(null)
+    setBuildNotices([])
     setOcrProgress(null)
     setStatus('idle')
   }, [resetOutput])
@@ -210,20 +273,28 @@ export function useConverter() {
     coverTheme,
     customCover,
     embedFonts,
+    customFonts,
+    cjkFontId,
     preflightResult,
     result,
     error,
     ocrProgress,
+    buildNotices,
     setTitle,
     setAuthor,
     setCoverMode,
     setCoverTheme,
     setCustomCoverFile,
     setEmbedFonts,
+    setCjkFontId,
+    addCustomFont,
+    removeCustomFont,
     loadFile,
     loadUrl,
     loadHtml,
     loadImage,
+    loadImages,
+    loadPreset,
     build,
     reset,
   }

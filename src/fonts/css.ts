@@ -29,7 +29,7 @@ export function readingFontStack(script: ScriptHint, primaryFamily?: string): st
     arabic: ['LPMQ Isep Misbah', 'KFGQPC Uthmanic Hafs', 'Amiri Quran', 'Scheherazade New', 'serif'],
     latin: ['Literata', 'Bookerly', 'Charis SIL', 'Georgia', 'serif'],
     cyrillic: ['Literata', 'Georgia', 'serif'],
-    cjk: ['Noto Sans CJK', 'sans-serif'],
+    cjk: ['Noto Sans SC', 'Noto Sans JP', 'Noto Sans KR', 'sans-serif'],
     javanese: ['Noto Sans Javanese', 'sans-serif'],
     sundanese: ['Noto Sans Sundanese', 'sans-serif'],
     unknown: ['Literata', 'Georgia', 'serif'],

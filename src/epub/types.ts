@@ -21,6 +21,8 @@ export interface ChapterFile {
   /** href relatif terhadap content.opf, mis. 'text/chap-1.xhtml'. */
   href: string
   chapter: Chapter
+  /** properties manifest (mis. 'svg' bila bab memuat SVG inline). */
+  properties?: string
 }
 
 /** Node generik untuk nav.xhtml & toc.ncx. */

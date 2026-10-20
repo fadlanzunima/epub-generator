@@ -34,7 +34,9 @@
       "@ui": ["src/ui/index.ts"],
       "@ui/*": ["src/ui/*"],
       "@pwa": ["src/pwa/index.ts"],
-      "@pwa/*": ["src/pwa/*"]
+      "@pwa/*": ["src/pwa/*"],
+      "@presets": ["src/presets/index.ts"],
+      "@presets/*": ["src/presets/*"]
     }
   },
   "include": ["src"]

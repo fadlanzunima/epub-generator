@@ -157,5 +157,18 @@ const arCss = await arZip.file('OEBPS/styles/content.css')!.async('string')
 ok('Arab CSS: @font-face LPMQ + line-height 2.0 (RTL via dir attr, bukan CSS)',
   /@font-face/.test(arCss) && /LPMQ Isep Misbah/.test(arCss) && /line-height:\s*2\.0/.test(arCss))
 
+// Image-Book + Inline SVG spesifik
+console.log('\n=== Image-Book + SVG ===')
+const bookEpub = samples.find((s) => s.name === 'imagebook')!.bytes
+const bookZip = await JSZip.loadAsync(bookEpub)
+const bookOpf = await bookZip.file('OEBPS/content.opf')!.async('string')
+ok('Image-Book: aset gambar ditulis ke OEBPS/images/', Object.keys(bookZip.files).includes('OEBPS/images/p1.png'))
+ok('Image-Book: manifest memuat item gambar (image/png)', /href="images\/p1\.png"[^>]*media-type="image\/png"/.test(bookOpf))
+const basmalahXhtml = await bookZip.file('OEBPS/text/chap-2.xhtml')!.async('string')
+ok('Inline SVG: bab kaligrafi memuat <svg>', /<svg[\s>]/.test(basmalahXhtml))
+ok('Inline SVG: item bab ber-properties="svg"', /href="text\/chap-2\.xhtml"[^>]*properties="[^"]*svg[^"]*"/.test(bookOpf))
+const imgXhtml = await bookZip.file('OEBPS/text/chap-1.xhtml')!.async('string')
+ok('Image-Book: src gambar diresolusi relatif bab (../images/)', /src="\.\.\/images\/p1\.png"/.test(imgXhtml))
+
 console.log(`\n=== VALIDASI: ${pass} lulus, ${fail} gagal, ${warn} peringatan ===`)
 process.exit(fail === 0 ? 0 : 1)

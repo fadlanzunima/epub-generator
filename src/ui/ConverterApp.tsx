@@ -3,15 +3,19 @@
  * Satu layar linear, ramah E-Ink (border tegas, tanpa animasi). 100% client-side.
  */
 import { InputPanel } from './InputPanel'
+import { StarterLibrary } from './StarterLibrary'
 import { CoverPanel } from './CoverPanel'
+import { CustomFontPanel } from './CustomFontPanel'
 import { Simulator } from './Simulator'
 import { PwaBar } from './PwaBar'
 import { TransferPanel } from './TransferPanel'
 import { Onboarding } from './Onboarding'
-import { Alert, Badge, Field, Section } from './primitives'
+import { Alert, Badge, Field, Section, SegmentedOption } from './primitives'
 import { useConverter } from './useConverter'
 import { useImmersion } from './useImmersion'
 import { useOnboarding } from './useOnboarding'
+import { useOnline } from './useOnline'
+import { CJK_FONT_CHOICES } from '@fonts'
 import type { ScriptHint, TextDirection } from '@core/types'
 
 const SCRIPT_LABEL: Record<ScriptHint, string> = {
@@ -32,11 +36,19 @@ export function ConverterApp() {
   const c = useConverter()
   const immersion = useImmersion()
   const onboarding = useOnboarding()
+  const online = useOnline()
   const busy = c.status === 'parsing' || c.status === 'building'
   const loaded = c.ir !== null
+  const isImageBook = c.ir?.meta.source === 'image-book'
+  // Dual-Pane hanya bila ada pratinjau (bukan Image-Book) — jika tidak, satu kolom.
+  const twoPane = loaded && !isImageBook && Boolean(c.ir?.chapters[0])
 
   return (
-    <main className="mx-auto flex min-h-full w-full max-w-2xl flex-col gap-6 px-5 py-8">
+    <main
+      className={`mx-auto flex min-h-full w-full flex-col gap-6 px-5 py-8 ${
+        twoPane ? 'max-w-2xl lg:max-w-5xl' : 'max-w-2xl'
+      }`}
+    >
       {onboarding.open && <Onboarding onFinish={onboarding.finish} />}
 
       <header className="flex items-center justify-between gap-3">
@@ -70,85 +82,148 @@ export function ConverterApp() {
 
       <PwaBar />
 
+      {!online && (
+        <Alert tone="warning">
+          Sedang offline. Konversi berkas lokal, OCR, Image-Book, dan font Arab/Latin tetap jalan.
+          Fitur yang butuh internet (Pustaka online, font CJK, ekstrak URL) tidak tersedia sampai
+          koneksi kembali.
+        </Alert>
+      )}
+
       {!loaded && (
-        <InputPanel
-          busy={busy}
-          ocrProgress={c.ocrProgress}
-          onFile={c.loadFile}
-          onUrl={c.loadUrl}
-          onHtml={c.loadHtml}
-          onImage={c.loadImage}
-        />
+        <>
+          <InputPanel
+            busy={busy}
+            online={online}
+            ocrProgress={c.ocrProgress}
+            onFile={c.loadFile}
+            onUrl={c.loadUrl}
+            onHtml={c.loadHtml}
+            onImage={c.loadImage}
+            onImages={c.loadImages}
+          />
+          <StarterLibrary busy={busy} online={online} onPick={(p) => c.loadPreset(p.load, p.title)} />
+        </>
       )}
 
       {c.status === 'error' && c.error && <Alert tone="error">{c.error}</Alert>}
 
       {loaded && c.ir && (
         <>
-          <Section title="Metadata">
-            <div className="flex flex-col gap-4">
-              <Field id="title" label="Judul" value={c.title} onChange={c.setTitle} placeholder="Judul buku" />
-              <Field id="author" label="Penulis" value={c.author} onChange={c.setAuthor} placeholder="(opsional)" />
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge>Bahasa: {c.ir.meta.language}</Badge>
-                <Badge>Skrip: {SCRIPT_LABEL[c.ir.meta.script]}</Badge>
-                <Badge>{dirLabel(c.ir.meta.direction)}</Badge>
-                <Badge>{c.ir.chapters.length} bab</Badge>
-              </div>
-              <p className="font-ui text-body text-ink-faint">Sumber: {c.sourceName}</p>
+          {/* Dual-Pane: di layar lebar (tablet/PC) editor di kiri, pratinjau
+              menempel di kanan; di layar sempit (HP/eReader) satu kolom. */}
+          <div className={twoPane ? 'flex flex-col gap-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6' : 'flex flex-col gap-6'}>
+            <div className="flex min-w-0 flex-col gap-6">
+              <Section title="Metadata">
+                <div className="flex flex-col gap-4">
+                  <Field id="title" label="Judul" value={c.title} onChange={c.setTitle} placeholder="Judul buku" />
+                  <Field id="author" label="Penulis" value={c.author} onChange={c.setAuthor} placeholder="(opsional)" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge>Bahasa: {c.ir.meta.language}</Badge>
+                    <Badge>Skrip: {SCRIPT_LABEL[c.ir.meta.script]}</Badge>
+                    <Badge>{dirLabel(c.ir.meta.direction)}</Badge>
+                    <Badge>{c.ir.chapters.length} bab</Badge>
+                  </div>
+                  <p className="font-ui text-body text-ink-faint">Sumber: {c.sourceName}</p>
+                </div>
+              </Section>
+
+              <Section title="Daftar Bab">
+                <ol className="flex flex-col gap-1">
+                  {c.ir.chapters.map((chap, i) => (
+                    <li key={chap.id} className="flex items-baseline justify-between border-b border-paper-line py-1.5 last:border-0">
+                      <span className="font-ui text-body-lg text-ink">
+                        <span className="text-ink-faint">{i + 1}.</span> {chap.title}
+                      </span>
+                      <span className="font-ui text-body text-ink-faint">{chap.blocks.length} blok</span>
+                    </li>
+                  ))}
+                </ol>
+              </Section>
+
+              <Section title="Sampul">
+                <CoverPanel
+                  mode={c.coverMode}
+                  theme={c.coverTheme}
+                  custom={c.customCover}
+                  title={c.title}
+                  author={c.author}
+                  onMode={c.setCoverMode}
+                  onTheme={c.setCoverTheme}
+                  onCustomFile={c.setCustomCoverFile}
+                />
+              </Section>
+
+              <Section title="Opsi">
+                <div className="flex flex-col gap-4">
+                  <label className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={c.embedFonts}
+                      onChange={(e) => c.setEmbedFonts(e.target.checked)}
+                      className="h-5 w-5 accent-black"
+                    />
+                    <span className="font-ui text-body-lg text-ink">
+                      Sematkan font (embed) — penting untuk skrip Arab/non-Latin
+                    </span>
+                  </label>
+                  {c.ir.meta.script === 'cjk' && (
+                    <div className="flex flex-col gap-2 border-t border-paper-line pt-4">
+                      <span className="font-ui text-body-lg text-ink">
+                        Font CJK (China/Jepang/Korea) — tidak dibundel, unduh saat build
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        <SegmentedOption active={c.cjkFontId === null} onClick={() => c.setCjkFontId(null)} disabled={busy}>
+                          Tidak embed
+                        </SegmentedOption>
+                        {CJK_FONT_CHOICES.map((choice) => (
+                          <SegmentedOption
+                            key={choice.id}
+                            active={c.cjkFontId === choice.id}
+                            onClick={() => c.setCjkFontId(choice.id)}
+                            disabled={busy}
+                          >
+                            {choice.label} · ±{choice.approxMb} MB
+                          </SegmentedOption>
+                        ))}
+                      </div>
+                      <p className="font-ui text-body text-ink-faint">
+                        Dipilih → font diunduh sekali dari CDN, di-subset (hasil embed kecil), lalu
+                        di-cache untuk offline. "Tidak embed" memakai font CJK bawaan eReader.
+                      </p>
+                      {!online && c.cjkFontId !== null && (
+                        <Alert tone="warning">
+                          Sedang offline — font CJK tidak dapat diunduh. Jika tetap Build, EPUB
+                          memakai font CJK bawaan eReader.
+                        </Alert>
+                      )}
+                    </div>
+                  )}
+                  <div className="border-t border-paper-line pt-4">
+                    <CustomFontPanel
+                      fonts={c.customFonts}
+                      onAdd={c.addCustomFont}
+                      onRemove={c.removeCustomFont}
+                      disabled={busy}
+                    />
+                  </div>
+                </div>
+              </Section>
             </div>
-          </Section>
 
-          <Section title="Daftar Bab">
-            <ol className="flex flex-col gap-1">
-              {c.ir.chapters.map((chap, i) => (
-                <li key={chap.id} className="flex items-baseline justify-between border-b border-paper-line py-1.5 last:border-0">
-                  <span className="font-ui text-body-lg text-ink">
-                    <span className="text-ink-faint">{i + 1}.</span> {chap.title}
-                  </span>
-                  <span className="font-ui text-body text-ink-faint">{chap.blocks.length} blok</span>
-                </li>
-              ))}
-            </ol>
-          </Section>
-
-          {c.ir.chapters[0] && (
-            <Section title="Pratinjau (Live Simulator)">
-              <Simulator
-                chapter={c.ir.chapters[0]}
-                script={c.ir.meta.script}
-                direction={c.ir.meta.direction}
-                lang={c.ir.meta.language}
-              />
-            </Section>
-          )}
-
-          <Section title="Sampul">
-            <CoverPanel
-              mode={c.coverMode}
-              theme={c.coverTheme}
-              custom={c.customCover}
-              title={c.title}
-              author={c.author}
-              onMode={c.setCoverMode}
-              onTheme={c.setCoverTheme}
-              onCustomFile={c.setCustomCoverFile}
-            />
-          </Section>
-
-          <Section title="Opsi">
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={c.embedFonts}
-                onChange={(e) => c.setEmbedFonts(e.target.checked)}
-                className="h-5 w-5 accent-black"
-              />
-              <span className="font-ui text-body-lg text-ink">
-                Sematkan font (embed) — penting untuk skrip Arab/non-Latin
-              </span>
-            </label>
-          </Section>
+            {twoPane && c.ir.chapters[0] && (
+              <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-8">
+                <Section title="Pratinjau (Live Simulator)">
+                  <Simulator
+                    chapter={c.ir.chapters[0]}
+                    script={c.ir.meta.script}
+                    direction={c.ir.meta.direction}
+                    lang={c.ir.meta.language}
+                  />
+                </Section>
+              </div>
+            )}
+          </div>
 
           {c.preflightResult && (c.preflightResult.errors.length > 0 || c.preflightResult.warnings.length > 0) && (
             <div className="flex flex-col gap-2">
@@ -157,6 +232,14 @@ export function ConverterApp() {
               ))}
               {c.preflightResult.warnings.map((msg, i) => (
                 <Alert key={`w${i}`} tone="warning">{msg}</Alert>
+              ))}
+            </div>
+          )}
+
+          {c.buildNotices.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {c.buildNotices.map((msg, i) => (
+                <Alert key={`n${i}`} tone="warning">{msg}</Alert>
               ))}
             </div>
           )}

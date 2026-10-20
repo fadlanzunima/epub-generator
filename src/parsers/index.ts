@@ -18,6 +18,8 @@ export { articleToBlocks, parseArticleHtml, fetchArticle } from './url'
 export type { ArticleResult } from './url'
 export { imageToText, ocrImageToBlocks } from './ocr'
 export type { OcrOptions } from './ocr'
+export { parseImagesToBook } from './imageBook'
+export type { ImageBookOptions } from './imageBook'
 
 /** Format sumber yang didukung Fase 1. */
 export type SourceFormat = 'docx' | 'markdown' | 'text' | 'csv' | 'xlsx'
