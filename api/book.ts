@@ -36,12 +36,19 @@ export default async function handler(req: any, res: any) {
   const action = (req.query?.action as string) || 'probe'
 
   if (action === 'probe') {
+    const sw = '21618-wild-cat-wild-cat'
     const results = await Promise.all([
-      probeOne('letsread:languages', 'https://api.letsreadasia.org/v3/language/list?addLanguagesWithNoBook=false'),
-      probeOne('letsread:byLanguage', 'https://api.letsreadasia.org/v3/book/byLanguage?languageId=6260074016145408&limit=3'),
-      probeOne('gdl:languages', 'https://api.digitallibrary.io/book-api/v1/languages'),
-      probeOne('gdl:books/ind', 'https://api.digitallibrary.io/book-api/v1/books/ind?page-size=3'),
-      probeOne('storyweaver:read.json(gated?)', 'https://storyweaver.org.in/api/v1/stories/21618-wild-cat-wild-cat/read.json'),
+      // StoryWeaver: endpoint unduh PDF/epub (mungkin publik, tak gated seperti reader)
+      probeOne('sw:pdf-download', `https://storyweaver.org.in/api/v1/books/${sw}/download?type=pdf`),
+      probeOne('sw:epub-download', `https://storyweaver.org.in/api/v1/books/${sw}/download?type=epub`),
+      probeOne('sw:v0 download', `https://storyweaver.org.in/v0/stories/download-story/${sw}.pdf`),
+      probeOne('sw:gcs-image', 'https://storage.googleapis.com/static.storyweaver.org.in/illustration_crops/722383/size7/b67b65b0b4e07eecc3cd0aa184e1548c.jpg'),
+      // GDL host alternatif
+      probeOne('gdl:root', 'https://api.digitallibrary.io/'),
+      probeOne('gdl:opds', 'https://api.digitallibrary.io/book-api/opds/v1/root.xml'),
+      // Let's Read host alternatif
+      probeOne('letsread:www', 'https://www.letsreadasia.org/'),
+      probeOne('letsread:reader', 'https://reader.letsreadasia.org/'),
     ])
     res.status(200).json({ ok: true, runtime: 'node', action, results })
     return
