@@ -31,9 +31,42 @@ async function probeOne(label: string, url: string) {
   }
 }
 
+async function discoverLetsRead() {
+  const out: Record<string, unknown> = {}
+  try {
+    const r = await fetch('https://reader.letsreadasia.org/', { headers: { 'User-Agent': UA } })
+    const html = await r.text()
+    out.htmlStatus = r.status
+    // kumpulkan src script & href yang menunjuk host/api
+    const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1]).slice(0, 10)
+    out.scripts = scripts
+    // cari string host api di HTML
+    const hosts = [...new Set((html.match(/https?:\/\/[a-z0-9.-]*letsreadasia[a-z0-9.\-/]*/gi) || []))].slice(0, 15)
+    out.letsreadHosts = hosts
+    // ambil satu bundle JS & cari base API
+    const js = scripts.find((s) => /main|app|chunk|bundle/.test(s))
+    if (js) {
+      const jsUrl = js.startsWith('http') ? js : `https://reader.letsreadasia.org${js}`
+      const jr = await fetch(jsUrl, { headers: { 'User-Agent': UA } })
+      const jt = await jr.text()
+      const apis = [...new Set((jt.match(/https?:\/\/[a-z0-9.-]+\.(?:org|io|com|app)[a-z0-9.\-/_]*(?:api|book|graphql)[a-z0-9.\-/_]*/gi) || []))].slice(0, 20)
+      out.jsApiHints = apis
+      out.jsLen = jt.length
+    }
+  } catch (e) {
+    out.error = `${(e as Error).name}: ${(e as Error).message}`
+  }
+  return out
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function handler(req: any, res: any) {
   const action = (req.query?.action as string) || 'probe'
+
+  if (action === 'discover') {
+    res.status(200).json({ ok: true, letsread: await discoverLetsRead() })
+    return
+  }
 
   if (action === 'probe') {
     const sw = '21618-wild-cat-wild-cat'
