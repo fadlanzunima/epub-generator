@@ -11,6 +11,7 @@ const CATEGORY_LABEL: Record<PresetItem['category'], string> = {
   quran: 'Al-Qur’an',
   document: 'Dokumen Publik',
   classic: 'Buku Klasik',
+  folktale: 'Cerita Rakyat',
 }
 
 export function StarterLibrary({

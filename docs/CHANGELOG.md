@@ -36,10 +36,14 @@ Acuan produk: [BRIEF.md](BRIEF.md). Catatan yang memengaruhi hasil: [CATATAN-KON
   pakai **gambar pertama** dokumen sebagai sampul. Resolver menangani data-URI (docx),
   path aset (Image-Book), & URL remote (artikel); bila tak ada gambar → EPUB tanpa sampul
   + toast. `src/cover/extract.ts` (`resolveFirstImageCover`).
-- **Pustaka klasik (Public Repo Integration)**: preset **Student Hidjo** (Mas Marco
-  Kartodikromo, 1919 — public domain) via **Wikisource** (MediaWiki action API, CORS `origin=*`),
+- **Pustaka klasik (Public Repo Integration)**: preset **Student Hidjo** (1919) &
+  **Tjerita Njai Dasima** (1896) via **Wikisource** (MediaWiki action API, CORS `origin=*`),
   dibersihkan dengan pipeline Readability yang ada. Kategori baru "Buku Klasik".
   `src/presets/wikisource.ts`. (Gutenberg di-skip: server tanpa CORS.)
+- **Cerita Rakyat Indonesia** (buku anak): preset **offline** Malin Kundang, Timun Mas,
+  Sangkuriang — penceritaan ulang folklor (domain publik) dipaket di app, kategori baru
+  "Cerita Rakyat". `src/presets/folktales.ts`. (Buku anak CC ber-API seperti StoryWeaver/
+  Let's Read belum dipakai — API tak terdokumentasi/diblokir CORS; proxy serverless di backlog.)
 - **Subsetting font di Web Worker**: subset HarfBuzz dipindah ke `subsetWorker` (via
   `subsetClient`, `vite worker.format:'es'`) → **UI tak freeze** untuk font besar (CJK 10–18 MB);
   fail-safe (echo font utuh) + fallback main-thread bila Worker tak tersedia.
